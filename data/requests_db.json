@@ -1,0 +1,29 @@
+[
+  {
+    "id": "981c7ed6-66f9-4966-b8ab-4a2e57f47e96",
+    "user": "alice",
+    "start_date": "2025-09-18",
+    "end_date": "2025-09-20",
+    "reason": "travel",
+    "status": "submitted",
+    "created_at": "2025-09-06T23:15:46Z"
+  },
+  {
+    "id": "b5d21696-8317-48b5-a8bb-80accbe0bccd",
+    "user": "Pranshav",
+    "start_date": "2025-10-02",
+    "end_date": "2025-10-04",
+    "reason": "Family wedding",
+    "status": "cancelled",
+    "created_at": "2025-09-07T01:23:13Z"
+  },
+  {
+    "id": "e2d71b56-c8cf-44cb-b27a-6bb7e1983ade",
+    "user": "Pranshav",
+    "start_date": "2025-10-02",
+    "end_date": "2025-10-04",
+    "reason": "Family wedding",
+    "status": "submitted",
+    "created_at": "2025-09-07T02:50:26Z"
+  }
+]

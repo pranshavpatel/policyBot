@@ -65,12 +65,3 @@ def on_slash(ack, respond, command):
 if __name__ == "__main__":
     handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
     handler.start()
-
-
-#  signing secret = a80221a5b4f77c85fafc319b9faf3e3b
-
-#  export SLACK_SIGNING_SECRET=a80221a5b4f77c85fafc319b9faf3e3b
-# export SLACK_BOT_TOKEN=xoxb-9487410091860-9483575441318-znZwbMZlum7Pxw8XWfW9BLHu
-# export AGENT_URL="http://localhost:8000/agent"
-
-# uvicorn slack_bridge:app --port 3001 --reload

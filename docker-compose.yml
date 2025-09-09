@@ -29,6 +29,3 @@ services:
 
 volumes:
   chroma_data:
-
-# mytoken slack bot=xapp-1-A09ELM93KED-9469003174471-30c639b808f31581765a66ff9663cac96c24c992e46fbcd691ade54b33a232a2
-# Bot User OAuth Token=xoxb-9487410091860-9483575441318-znZwbMZlum7Pxw8XWfW9BLHu

@@ -80,7 +80,6 @@ docker compose up --build
 ### 5. Slack Integration
 - Create a Slack App → Add **Event Subscriptions**
 - Set Request URL to your **ngrok tunnel** (e.g., `https://xxxx.ngrok-free.app/slack/events`)
-- Backend must handle Slack **challenge** verification.
 
 ---
 

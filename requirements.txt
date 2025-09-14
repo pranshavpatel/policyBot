@@ -6,6 +6,8 @@ uvicorn[standard]==0.30.1
 langchain==0.2.12
 langchain-community==0.2.11
 langchain_groq
+langchain-huggingface==0.0.3
+langchain_huggingface
 
 # Vector store
 chromadb==0.5.3
@@ -16,10 +18,21 @@ transformers==4.43.3
 torch==2.3.1           # CPU wheel available for linux/arm64 and amd64
 
 # Data & utils
-pydantic==2.7.4
-pydantic-settings==2.3.3
+pydantic==2.8.2
+pydantic-settings==2.3.4
 python-multipart==0.0.9
+python-dotenv==1.0.1
 
 # Testing & dev (optional)
 pytest==8.2.2
 httpx==0.27.0
+
+# --- HTTP client / utils ---
+httpx==0.27.2
+requests==2.32.3
+orjson==3.10.7
+ujson==5.10.0
+
+# --- Slack (for /slack/events endpoint) ---
+slack-bolt==1.19.1
+slack-sdk==3.27.1

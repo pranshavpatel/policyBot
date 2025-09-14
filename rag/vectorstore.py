@@ -1,8 +1,11 @@
+import os
 from typing import List
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 from .embeddings import get_embeddings
 from config import CHROMA_DIR
+
+VECTORSTORE_PATH = os.getenv("VECTORSTORE_PATH", "vectorstore/chroma_policybot")
 
 def upsert_documents(docs: List[Document]):
     """Create or update a persistent Chroma DB from documents."""

@@ -26,7 +26,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build vectorstore (local embeddings, no API key needed)
-        run: python scripts/ingest_langchain.py
+        run: python -m scripts.ingest_langchain
 
       - name: Run tests
         run: pytest tests/ -v

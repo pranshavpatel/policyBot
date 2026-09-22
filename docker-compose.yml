@@ -3,15 +3,15 @@ services:
   api:
     build: ./
     container_name: policybot-api
+    env_file:
+      - .env   # GROQ_API_KEY, JWT_SECRET, etc. — see .env.example
     environment:
       - PYTHONUNBUFFERED=1
-      - EMBED_MODEL=BAAI/bge-small-en-v1.5
       - CHROMA_DIR=/data/chroma
-      - ALLOW_ORIGIN=http://localhost:5173
-      - API_AUTH_TOKEN=dev-token-123
+      - DATABASE_URL=sqlite:////data/policybot.db
     volumes:
       - chroma_data:/data/chroma
-      - ./trial_project:/app
+      - db_data:/data
     ports:
       - "8000:8000"
     command: uvicorn api.app:app --host 0.0.0.0 --port 8000
@@ -29,3 +29,4 @@ services:
 
 volumes:
   chroma_data:
+  db_data:

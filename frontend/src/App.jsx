@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { askAgent } from "./api";
+import { askAgent, AuthError } from "./api";
+import { getCurrentUser, clearToken } from "./auth";
 import ChatMessage from "./components/ChatMessage";
 import Trace from "./components/Trace";
 import PromptChips from "./components/PromptChips";
+import Login from "./components/Login";
 
 // Citation-splitting logic lives inline in send() below, where it's used.
 export default function App() {
+  const [user, setUser] = useState(() => getCurrentUser());
   const [input, setInput] = useState("");
   const [traceOn, setTraceOn] = useState(false);
   const [lastTrace, setLastTrace] = useState(null);
@@ -15,11 +18,19 @@ export default function App() {
   ]);
   const scrollRef = useRef(null);
 
+  // All hooks above run unconditionally on every render (Rules of Hooks) —
+  // the logged-out gate below is a plain conditional *return*, not a
+  // conditional hook call.
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, loading]);
+
+  function logout() {
+    clearToken();
+    setUser(null);
+  }
 
   async function send(msg) {
     const content = msg?.trim() || input.trim();
@@ -35,6 +46,10 @@ export default function App() {
       setMessages((m) => [...m, { role: "assistant", text, citation }]);
       setLastTrace(data?.trace || null);
     } catch (e) {
+      if (e instanceof AuthError) {
+        setUser(null); // drop back to the login screen on an expired/invalid token
+        return;
+      }
       setMessages((m) => [...m, { role: "assistant", text: `Server error: ${e.message}` }]);
       console.error(e);
     } finally {
@@ -49,6 +64,10 @@ export default function App() {
     }
   }
 
+  if (!user) {
+    return <Login onSignedIn={() => setUser(getCurrentUser())} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900">
       <header className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b">
@@ -57,10 +76,20 @@ export default function App() {
             <h1 className="text-2xl font-bold">PolicyBot</h1>
             <p className="text-sm text-slate-600">Your smart HR assistant – Ask questions, request PTO, and manage leave effortlessly!</p>
           </div>
-          <label className="text-sm text-slate-700 flex items-center gap-2">
-            <input type="checkbox" checked={traceOn} onChange={(e)=>setTraceOn(e.target.checked)} />
-            Show trace
-          </label>
+          <div className="flex items-center gap-4">
+            <label className="text-sm text-slate-700 flex items-center gap-2">
+              <input type="checkbox" checked={traceOn} onChange={(e)=>setTraceOn(e.target.checked)} />
+              Show trace
+            </label>
+            <div className="text-sm text-slate-600 flex items-center gap-2">
+              <span>
+                {user.username} <span className="text-slate-400">({user.role})</span>
+              </span>
+              <button onClick={logout} className="text-xs px-2 py-1 rounded-lg border hover:bg-gray-50">
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -92,7 +121,7 @@ export default function App() {
         <div className="mt-4 flex gap-3">
           <textarea
             className="flex-1 border rounded-2xl p-3 text-sm min-h-[90px] outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ask about PTO… or try: Request PTO from 2025-10-02 to 2025-10-04 for user Pranshav"
+            placeholder="Ask about PTO… or try: Request PTO from 2025-10-02 to 2025-10-04"
             value={input}
             onChange={(e)=>setInput(e.target.value)}
             onKeyDown={onKeyDown}

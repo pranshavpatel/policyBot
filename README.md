@@ -137,14 +137,21 @@ When an answer fails the check, it's swapped for an explicit low-confidence fall
 
 ## End-to-end answer-quality eval
 
-`scripts/eval_via_api.py` runs `eval/qa.jsonl` against a live `/agent` endpoint and checks `must_contain`/`must_not` on the final answer — this is the one eval that needs a real `GROQ_API_KEY` (it makes live LLM calls), so it isn't part of CI:
+`scripts/eval_via_api.py` logs in, then runs `eval/qa.jsonl` against a live `/agent` endpoint and checks `must_contain`/`must_not` on the final answer — this is the one eval that needs a real `GROQ_API_KEY` (it makes live LLM calls), so it isn't part of CI:
 
 ```bash
 uvicorn api.app:app --port 8000 &
 python -m scripts.eval_via_api eval/qa.jsonl
 ```
 
-*(Numbers not included here — this development environment didn't have a `GROQ_API_KEY` configured. Run the command above with your own key to populate this; everything else in this README — retrieval hit-rate, the RBAC/audit trace, the 45-test suite — was actually executed, not estimated.)*
+**Result on a real run (`openai/gpt-oss-20b` on Groq): 40/45 = 88.9%.**
+
+Two things surfaced only by actually running this against a live model, both worth being explicit about rather than smoothing over:
+
+- **A real eval-harness bug**: the raw run scored 38/45. Two "failures" — `"By when must carried-over PTO be used?"` and the Day-1 benefits question — had visibly correct answers (`"...used by June 30..."`, `"...begin on Day 1..."`) that the naive `must_contain` substring check still missed, because the model renders some numbers with a narrow no-break space (`U+202F`, e.g. `"June 30"`) instead of an ASCII space. Fixed by NFKC-normalizing both sides before comparing (`scripts/eval_via_api.py::_norm`); re-verified against the exact captured answers rather than re-spending API calls on a second full run. That's the 38→40 delta.
+- **A real hallucination**, still present: asked *"Who do I contact if my VPN reset still isn't working?"*, the agent answered *"contact the IT Help Desk... helpdesk@company.com or call extension 1234"* — a phone extension and email address invented wholesale; the actual policy (`vpn_reset.md`) says to contact `#it-support`. The likely cause: the ReAct planner sometimes emits `{"action":"final",...}` directly after a tool call instead of routing the final answer back through `tools/qa_chain.py`'s groundedness check (`agent/react_agent.py`'s `outcome: "final_no_tool"` in the logs) — so an answer can reach the user without ever passing through `rag/groundedness.py`. That's a real architectural gap, not a rare fluke, and the honest next fix (not done here — it changes agent control flow, not a config value): route every `final` action's answer through `check_groundedness()` before returning it, not just the direct `rag_answer` tool path.
+- **Two more "failures"** (a stock-ticker question got a fabricated `"XYZ"`; a dress-code question and a CEO-salary question were both correctly refused, just phrased differently than the exact string the harness checked for) split roughly one real miss, one strict-match harness artifact — included in the raw count above rather than argued away.
+- **Latency was high**: most answers took 15–40+ seconds. Partly this model's serving latency on Groq, partly the ReAct loop re-planning 2–3 steps per question when one `rag_answer` call would do — visible directly in the structured logs (`agent_run` `steps` field). Worth profiling before this goes anywhere near a real Slack channel.
 
 ---
 

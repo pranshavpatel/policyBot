@@ -5,7 +5,9 @@ load_dotenv()
 
 # LLM
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+# llama-3.1-8b-instant was retired from Groq's catalog; verified against
+# https://api.groq.com/openai/v1/models with a live key (2026-09-22).
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
 # Embeddings
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")

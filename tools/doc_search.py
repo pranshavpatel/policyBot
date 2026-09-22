@@ -1,8 +1,8 @@
 from typing import Dict, Any, List, Tuple
-from rag.vectorstore import get_retriever
+from rag.retrieval import get_configured_retriever
 
 def doc_search(query: str, k: int = 5) -> Dict[str, Any]:
-    retriever = get_retriever(k=k)
+    retriever = get_configured_retriever(k=k)
     docs = retriever.invoke(query)
 
     def sect(md):

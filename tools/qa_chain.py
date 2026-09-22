@@ -3,7 +3,8 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from config import GROQ_API_KEY, GROQ_MODEL
-from rag.vectorstore import get_retriever
+from rag.retrieval import get_configured_retriever
+from rag.groundedness import check_groundedness, UNGROUNDED_FALLBACK
 
 SYSTEM_PROMPT = """
 You are an HR policy assistant. Answer ONLY using the provided context.
@@ -38,12 +39,22 @@ class QAChain:
         docs: List[Document] = self.retriever.invoke(query)
         context = "\n\n".join(d.page_content for d in docs)
         message = self.llm.invoke(self.prompt.format(context=context, question=query))
-        return {"result": message.content, "source_documents": docs}
+        answer = message.content.strip()
+
+        groundedness = check_groundedness(answer, context)
+        if not groundedness.grounded:
+            answer = UNGROUNDED_FALLBACK
+
+        return {
+            "result": answer,
+            "source_documents": docs,
+            "groundedness": groundedness,
+        }
 
 
 def build_qa_chain(k: int = 5):
     llm = ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0)
-    retriever = get_retriever(k=k)
+    retriever = get_configured_retriever(k=k)
     prompt = PromptTemplate(
         template=SYSTEM_PROMPT.strip(),
         input_variables=["context", "question"],
@@ -54,3 +65,10 @@ def build_qa_chain(k: int = 5):
 def ask(qa: QAChain, query: str) -> Tuple[str, List[Document]]:
     out = qa.invoke({"query": query})
     return out["result"].strip(), out["source_documents"]
+
+
+def ask_with_groundedness(qa: QAChain, query: str) -> dict:
+    """Like ask(), but also returns the groundedness check result — used by
+    the eval harness (scripts/eval_via_api.py doesn't hit this directly, but
+    scripts/eval_retrieval.py and any future direct-chain eval can)."""
+    return qa.invoke({"query": query})

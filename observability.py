@@ -69,16 +69,20 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
         except Exception:
+            # Log (context var still set) before resetting, then re-raise.
             log_event(log, "request_failed", level=logging.ERROR,
                        method=request.method, path=request.url.path,
                        latency_ms=round((time.perf_counter() - t0) * 1000, 1))
-            raise
-        finally:
             _request_id_ctx.reset(token)
+            raise
+
         latency_ms = round((time.perf_counter() - t0) * 1000, 1)
         response.headers["X-Request-ID"] = req_id
+        # Log the success line BEFORE resetting — resetting first would log
+        # request_id="-" instead of the id just minted for this request.
         log_event(log, "request", method=request.method, path=request.url.path,
                    status_code=response.status_code, latency_ms=latency_ms)
+        _request_id_ctx.reset(token)
         return response
 
 

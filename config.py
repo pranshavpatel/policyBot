@@ -10,6 +10,9 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 # Embeddings
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
+# Database
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data/policybot.db")
+
 # Chroma settings (local persistent store)
 CHROMA_DIR = os.getenv("CHROMA_DIR", "vectorstore/chroma_policybot")
 

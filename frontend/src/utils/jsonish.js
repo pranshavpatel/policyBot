@@ -23,7 +23,11 @@ export function parseJsonish(text) {
   if (!text || typeof text !== "string") return null;
 
   // Try strict JSON first
-  try { return JSON.parse(text); } catch {}
+  try {
+    return JSON.parse(text);
+  } catch {
+    // not strict JSON — fall through to the jsonish extraction below
+  }
 
   // Extract the first balanced object
   let candidate = extractBalancedObject(text);

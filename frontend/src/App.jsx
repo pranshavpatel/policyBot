@@ -4,15 +4,7 @@ import ChatMessage from "./components/ChatMessage";
 import Trace from "./components/Trace";
 import PromptChips from "./components/PromptChips";
 
-function splitCitation(answer) {
-  // If your agent appends "(source — section)" at the end, pull it out
-  const m = answer.match(/\(([^()]+)\s—\s([^()]+)\)\s*$/);
-  if (!m) return { text: answer, citation: null };
-  const text = answer.slice(0, m.index).trim();
-  const citation = `(${m[1]} — ${m[2]})`;
-  return { text, citation };
-}
-
+// Citation-splitting logic lives inline in send() below, where it's used.
 export default function App() {
   const [input, setInput] = useState("");
   const [traceOn, setTraceOn] = useState(false);

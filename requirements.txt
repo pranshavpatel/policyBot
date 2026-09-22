@@ -10,6 +10,7 @@ langchain-huggingface>=0.3.1
 
 # Vector store / hybrid retrieval
 chromadb>=1.0.20
+langchain-chroma>=0.2.0
 rank_bm25>=0.2.2
 
 # Embeddings / models

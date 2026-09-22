@@ -1,5 +1,6 @@
 # agent/tools.py
 from typing import Any, Dict, Callable, List, Optional
+import functools
 import requests
 from tools.doc_search import doc_search
 from tools.holiday_check import check_holiday
@@ -25,6 +26,20 @@ def _require_actor(args: Dict[str, Any]) -> Dict[str, str]:
     if not actor or not actor.get("username"):
         raise PermissionDenied("Sign in required for this action.")
     return actor
+
+
+def _as_tool_error(fn: ToolFn) -> ToolFn:
+    """Turns a PermissionDenied raised anywhere in an actor-scoped tool into
+    the same {"error": "..."} shape every other tool failure already uses
+    (e.g. "request not found" below), instead of letting it escape as a raw
+    exception that only run_agent's catch-all would translate."""
+    @functools.wraps(fn)
+    def wrapper(args: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            return fn(args)
+        except PermissionDenied as e:
+            return {"error": str(e)}
+    return wrapper
 
 # --- Safe HTTP tool (allowlist) ---
 ALLOW_HTTP = ("http://localhost:8000", "https://httpbin.org")
@@ -78,6 +93,7 @@ def tool_doc_search(args: Dict[str, Any]) -> Dict[str, Any]:
     q = args.get("query", "")
     return doc_search(q, k=int(args.get("k", 5)))
 
+@_as_tool_error
 def tool_create_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     actor = _require_actor(args)
     # Always create on behalf of the authenticated caller, never a "user"
@@ -93,6 +109,7 @@ def tool_create_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     return {"created": req}
 
 
+@_as_tool_error
 def tool_list_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     actor = _require_actor(args)
     user = _clean_user(args.get("user"))
@@ -105,6 +122,7 @@ def tool_list_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     rows = list_leave_requests(user=user, status=status)
     return {"requests": rows, "count": len(rows)}
 
+@_as_tool_error
 def tool_approve_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     actor = _require_actor(args)
     row = get_leave_request(args["id"])
@@ -115,6 +133,7 @@ def tool_approve_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     write_audit(actor=actor["username"], action="approve", target_type="leave_request", target_id=args["id"])
     return out
 
+@_as_tool_error
 def tool_reject_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     actor = _require_actor(args)
     row = get_leave_request(args["id"])
@@ -125,6 +144,7 @@ def tool_reject_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     write_audit(actor=actor["username"], action="reject", target_type="leave_request", target_id=args["id"])
     return out
 
+@_as_tool_error
 def tool_cancel_leave(args: Dict[str, Any]) -> Dict[str, Any]:
     actor = _require_actor(args)
     row = get_leave_request(args["id"])

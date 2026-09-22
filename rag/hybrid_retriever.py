@@ -15,6 +15,7 @@ tools/doc_search.py and tools/qa_chain.py call sites; rag/hybrid_eval.py
 measures the actual retrieval-quality delta between the two.
 """
 from __future__ import annotations
+import re
 from pathlib import Path
 from typing import List
 
@@ -37,6 +38,16 @@ def load_corpus(policy_dir: Path = POLICY_DIR) -> List[Document]:
         text = path.read_text(encoding="utf-8")
         docs.extend(split_markdown(text, source=path.name))
     return docs
+
+
+_TOKEN_RE = re.compile(r"[A-Za-z0-9']+")
+
+
+def _tokenize(text: str) -> List[str]:
+    """BM25Retriever's default preprocess_func is just str.split() — no
+    lowercasing or punctuation stripping, so "(FMLA)." never matches a
+    query of "FMLA". Word-boundary tokenization + lowercasing fixes that."""
+    return _TOKEN_RE.findall(text.lower())
 
 
 def _doc_key(d: Document) -> str:
@@ -74,7 +85,7 @@ _bm25_singleton: BM25Retriever | None = None
 def _get_bm25(k: int) -> BM25Retriever:
     global _bm25_singleton
     if _bm25_singleton is None:
-        _bm25_singleton = BM25Retriever.from_documents(load_corpus())
+        _bm25_singleton = BM25Retriever.from_documents(load_corpus(), preprocess_func=_tokenize)
     _bm25_singleton.k = k
     return _bm25_singleton
 

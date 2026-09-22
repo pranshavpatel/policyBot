@@ -1,4 +1,5 @@
 # api/app.py
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -26,7 +27,14 @@ from observability import RequestLoggingMiddleware, get_logger
 
 log = get_logger(__name__)
 
-app = FastAPI(title="PolicyBot API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Idempotent; lets the API run standalone without a manual db_init step.
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(title="PolicyBot API", lifespan=lifespan)
 
 origins = [
     "http://localhost:5173",
@@ -41,13 +49,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RequestLoggingMiddleware)
-
-
-@app.on_event("startup")
-def on_startup():
-    # Idempotent; lets the API run standalone without a manual db_init step.
-    Base.metadata.create_all(bind=engine)
-
 
 qa = build_qa_chain(k=5)
 

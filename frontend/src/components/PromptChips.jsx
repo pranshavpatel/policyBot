@@ -2,8 +2,8 @@ const EXAMPLES = [
     "How many PTO days in Year 1?",
     "What is the PTO carryover limit?",
     "How do I request leave?",
-    "Request PTO from 2025-10-02 to 2025-10-04 for user Pranshav",
-    "List all of Pranshav's leave requests",
+    "Request PTO from 2025-10-02 to 2025-10-04",
+    "List my leave requests",
   ];
   
   export default function PromptChips({ onPick }) {

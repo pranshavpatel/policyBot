@@ -1,11 +1,13 @@
 # agent/react_agent.py
 import json
+import logging
 import time
 from typing import Any, Dict, List, Optional
 from langchain_groq import ChatGroq
 from config import GROQ_API_KEY, GROQ_MODEL
 from .tools import TOOLS
 from observability import get_logger, log_event
+from rag.groundedness import check_groundedness, UNGROUNDED_FALLBACK
 
 log = get_logger("agent")
 
@@ -24,7 +26,15 @@ Rules:
 - If user asks to cancel a leave request, use "cancel_leave_request" with {{ "id": "<uuid>" }}.
 - If asking about a specific date being a holiday, use "check_holiday".
 - If user explicitly asks to call an API endpoint, use "http_get" or "http_post".
-- If the answer is obvious and needs no tool, respond with {{ "action": "final", "answer": "..." }}.
+- For ANY question about a company policy, benefit, or HR/IT fact — PTO, benefits,
+  passwords, devices, VPN, reimbursement, etc. — always use "rag_answer" first,
+  even if you already believe you know the answer. Never answer a policy
+  question from your own knowledge; the company's actual policy may differ
+  from what's typical, and a fabricated number or contact detail is worse
+  than a slower correct one.
+- Only use {{ "action": "final", "answer": "..." }} directly (no tool) for
+  greetings, small talk, or acknowledging an action already taken this turn —
+  never for a factual claim about policy.
 
 Return JSON like:
 {{ "action":"tool","name":"rag_answer","args":{{"query":"How many PTO days in Year 1?"}} }}
@@ -105,6 +115,33 @@ def synthesize(user_msg: str, tool_name: str, tool_output: Dict[str, Any]) -> st
         return "Here is what I found: " + str(tool_output)[:500]
 
 
+def _ground_final_answer(answer: str, rag_context_parts: List[str]) -> str:
+    """Safety net for hallucination that the prompt rule above can't fully
+    prevent on its own: whatever text is about to be returned as the FINAL
+    answer — whether the planner's own "final" action, or the synthesize()
+    step after the tool-call loop — gets checked against every bit of
+    policy context any rag_answer call saw during this run, not just
+    against what QAChain.invoke() itself already checked (tool_rag_answer's
+    "grounded" flag only covers the tool's own answer text; a later "final"
+    or synthesize() step can restate/elaborate on it in new words that
+    reintroduce an unsupported claim, or skip the tool entirely and invent
+    one from scratch — the case this was written after: "contact IT" from
+    the real policy became a fabricated "helpdesk@company.com, ext. 1234").
+
+    If no rag_answer call happened this run, context is "" — meaning any
+    numeric/date claim in the answer is automatically unsupported, which is
+    the correct call: a policy fact with zero retrieval behind it shouldn't
+    reach the user asserted as fact.
+    """
+    context = "\n\n".join(p for p in rag_context_parts if p)
+    result = check_groundedness(answer, context)
+    if result.grounded:
+        return answer
+    log_event(log, "groundedness_blocked", level=logging.WARNING, coverage=result.coverage,
+              unsupported_claims=result.unsupported_claims, had_context=bool(context))
+    return UNGROUNDED_FALLBACK
+
+
 def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: int = 3) -> Dict[str, Any]:
     """
     actor: {"username": "...", "role": "employee"|"manager"} of the authenticated
@@ -127,6 +164,7 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
     trace: List[Dict[str, Any]] = []
     last_obs: Optional[Dict[str, Any]] = None
     last_tool_name: Optional[str] = None
+    rag_context_parts: List[str] = []
     context_for_planner = user_msg
     run_t0 = time.perf_counter()
 
@@ -135,10 +173,11 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
         trace.append({"step": step, "plan": plan})
 
         if plan.get("action") == "final":
+            answer = _ground_final_answer(plan.get("answer", ""), rag_context_parts)
             total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
             log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=step,
                       total_latency_ms=total_ms, outcome="final_no_tool")
-            return {"type": "final", "answer": plan.get("answer", ""), "steps": step, "trace": trace}
+            return {"type": "final", "answer": answer, "steps": step, "trace": trace}
 
         if plan.get("action") == "tool":
             name = plan.get("name")
@@ -164,6 +203,8 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
                       ok=("error" not in obs) if isinstance(obs, dict) else True)
 
             trace.append({"step": step, "observation": obs, "latency_ms": tool_latency_ms})
+            if name == "rag_answer" and isinstance(obs, dict) and obs.get("context"):
+                rag_context_parts.append(obs["context"])
             last_obs = obs
             last_tool_name = name
             # feed observation back to planner context
@@ -178,7 +219,7 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
     # step limit reached → synthesize with last observation if any
     total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
     if last_obs is not None and last_tool_name is not None:
-        final = synthesize(user_msg, last_tool_name, last_obs)
+        final = _ground_final_answer(synthesize(user_msg, last_tool_name, last_obs), rag_context_parts)
         trace.append({"synthesis": {"from_tool": last_tool_name}})
         log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=max_steps,
                   total_latency_ms=total_ms, outcome="synthesized")

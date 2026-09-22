@@ -15,6 +15,7 @@ frontend/dist/
 # Chroma / runtime data
 vectorstore/
 *.sqlite3
+data/policybot.db
 
 # OS / editor
 .DS_Store

@@ -1,8 +1,7 @@
 from typing import Tuple, List
 from langchain_groq import ChatGroq
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
-from langchain.schema import Document
+from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
 from config import GROQ_API_KEY, GROQ_MODEL
 from rag.vectorstore import get_retriever
 
@@ -18,25 +17,40 @@ Question: {question}
 Answer:
 """
 
+
+class QAChain:
+    """Minimal 'stuff' RAG chain: retrieve -> stuff context into prompt -> LLM.
+
+    Replaces the legacy langchain.chains.RetrievalQA, which is incompatible
+    with the langchain-core version this project resolves to (its Chain
+    base class imports langchain_core.memory.BaseMemory, removed upstream).
+    A hand-rolled LCEL-style chain has no such dependency and is the
+    currently-recommended pattern anyway.
+    """
+
+    def __init__(self, llm: ChatGroq, retriever, prompt: PromptTemplate):
+        self.llm = llm
+        self.retriever = retriever
+        self.prompt = prompt
+
+    def invoke(self, inputs: dict) -> dict:
+        query = inputs["query"]
+        docs: List[Document] = self.retriever.invoke(query)
+        context = "\n\n".join(d.page_content for d in docs)
+        message = self.llm.invoke(self.prompt.format(context=context, question=query))
+        return {"result": message.content, "source_documents": docs}
+
+
 def build_qa_chain(k: int = 5):
     llm = ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0)
     retriever = get_retriever(k=k)
-
     prompt = PromptTemplate(
         template=SYSTEM_PROMPT.strip(),
         input_variables=["context", "question"],
     )
+    return QAChain(llm, retriever, prompt)
 
-    # "stuff" is fine for small contexts; switch to "map_reduce" if docs grow large
-    qa = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True,
-    )
-    return qa
 
-def ask(qa, query: str) -> Tuple[str, List[Document]]:
+def ask(qa: QAChain, query: str) -> Tuple[str, List[Document]]:
     out = qa.invoke({"query": query})
     return out["result"].strip(), out["source_documents"]

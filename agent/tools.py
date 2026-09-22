@@ -8,7 +8,6 @@ from tools.leave_request import (
     approve_leave_request, reject_leave_request, cancel_leave_request
 )
 from tools.qa_chain import build_qa_chain, ask
-_qa = build_qa_chain(k=5)
 
 ToolFn = Callable[[Dict[str, Any]], Dict[str, Any]]
 
@@ -145,19 +144,11 @@ TOOLS["rag_answer"] = {
     "fn": tool_rag_answer,
 }
 
-def tool_list_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    user = args.get("user")
-    rows = list_leave_requests(user)
-    return {"requests": rows, "count": len(rows)}
-
 TOOLS["list_leave_requests"] = {
     "description": "List leave requests; optional filters: user, status(submitted|approved|rejected|cancelled).",
     "schema": {"type":"object","properties":{"user":{"type":"string"},"status":{"type":"string"}}, "required":[]},
     "fn": tool_list_leave,
 }
-
-def tool_cancel_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    return cancel_leave_request(args["id"])
 
 TOOLS["cancel_leave_request"] = {
     "description": "Cancel a leave request by id.",

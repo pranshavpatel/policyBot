@@ -43,13 +43,13 @@ class AgentIn(BaseModel):
 def api_create_leave(req: LeaveRequestIn):
     return create_leave_request(req.user, req.start_date, req.end_date, req.reason)
 
-@app.get("/leave-requests")
-def api_list_leave(user: Optional[str] = None):
-    return list_leave_requests(user)
-
 @app.get("/leave-requests/{req_id}")
 def api_get_leave(req_id: str):
     return get_leave_request(req_id)
+
+@app.get("/holidays/next")
+def api_next(n: int = 5, start_date: Optional[str] = None):
+    return next_holidays(n=n, start_date=start_date)
 
 @app.get("/holidays/{date_str}")
 def api_check_holiday(date_str: str):
@@ -58,10 +58,6 @@ def api_check_holiday(date_str: str):
 @app.get("/holidays")
 def api_list_all(year: Optional[int] = None):
     return list_holidays(year)
-
-@app.get("/holidays/next")
-def api_next(n: int = 5, start_date: Optional[str] = None):
-    return next_holidays(n=n, start_date=start_date)
 
 @app.post("/chat")
 def api_chat(q: ChatIn):

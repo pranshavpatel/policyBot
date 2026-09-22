@@ -8,7 +8,7 @@ from tools.leave_request import (
     create_leave_request, list_leave_requests, get_leave_request,
     approve_leave_request, reject_leave_request, cancel_leave_request
 )
-from tools.qa_chain import build_qa_chain, ask
+from tools.qa_chain import build_qa_chain, ask_with_groundedness
 from auth.authz import assert_can_create, assert_can_moderate, assert_can_cancel, PermissionDenied
 from auth.audit import write_audit
 
@@ -197,10 +197,18 @@ TOOLS: Dict[str, Dict[str, Any]] = {
 _qa = build_qa_chain(k=5)
 def tool_rag_answer(args: Dict[str, Any]) -> Dict[str, Any]:
     q = args.get("query", "")
-    ans, srcs = ask(_qa, q)
+    out = ask_with_groundedness(_qa, q)
+    srcs = out["source_documents"]
     cites = [{"source": d.metadata.get("source"),
               "section": d.metadata.get("h2") or d.metadata.get("h1") or d.metadata.get("h3","")} for d in srcs]
-    return {"answer": ans, "citations": cites}
+    # Raw retrieved text, not just the LLM's answer — run_agent uses this to
+    # re-check the eventual *final* answer for groundedness, since a "final"
+    # plan step can restate/elaborate on this tool's output in its own
+    # words (see ACTOR_SCOPED_TOOLS note in react_agent.py for the parallel
+    # problem on the authz side; this is the RAG-quality analog of it).
+    context = "\n\n".join(d.page_content for d in srcs)
+    return {"answer": out["result"], "citations": cites, "context": context,
+            "grounded": out["groundedness"].grounded}
 
 # register it
 TOOLS["rag_answer"] = {

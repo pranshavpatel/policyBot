@@ -1,25 +1,60 @@
-import os, json, requests
+import os, json, time, threading, requests
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 API_BASE = os.getenv("API_BASE", "http://localhost:8000")
-API_AUTH_TOKEN = os.getenv("API_AUTH_TOKEN", "dev-token-123")
 SHOW_TRACE_DEFAULT = os.getenv("SHOW_TRACE_DEFAULT", "false").lower() == "true"
+
+# The API now requires a JWT (see auth/), not a static bearer token. Every
+# Slack user currently acts through one shared "service" identity — this
+# bot doesn't map individual Slack users to individual PolicyBot accounts,
+# so all leave-request actions from Slack are attributed to this account in
+# the audit log. Mapping real per-user identity (e.g. Slack SSO email ->
+# PolicyBot username) would be the natural next step if this needs
+# per-employee attribution from Slack specifically.
+SERVICE_USERNAME = os.getenv("POLICYBOT_SERVICE_USERNAME", "manager1")
+SERVICE_PASSWORD = os.getenv("POLICYBOT_SERVICE_PASSWORD", "manager123")
 
 app = App(token=os.environ["SLACK_BOT_TOKEN"])
 
-def call_agent(message: str, trace: bool = False):
-    try:
+_token_lock = threading.Lock()
+_token_cache = {"value": None, "expires_at": 0}
+
+
+def _get_token(force_refresh: bool = False) -> str:
+    with _token_lock:
+        if not force_refresh and _token_cache["value"] and time.time() < _token_cache["expires_at"]:
+            return _token_cache["value"]
         resp = requests.post(
-            f"{API_BASE}/agent",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {API_AUTH_TOKEN}"},
-            data=json.dumps({"message": message, "trace": trace}),
-            timeout=60,
+            f"{API_BASE}/auth/login",
+            data={"username": SERVICE_USERNAME, "password": SERVICE_PASSWORD},
+            timeout=15,
         )
         resp.raise_for_status()
-        return resp.json()
-    except Exception as e:
-        return {"type": "error", "answer": f"Agent error: {e}"}
+        token = resp.json()["access_token"]
+        # Re-login well before the server-side expiry (see JWT_EXPIRE_MINUTES).
+        _token_cache.update(value=token, expires_at=time.time() + 45 * 60)
+        return token
+
+
+def call_agent(message: str, trace: bool = False):
+    for attempt in (False, True):  # retry once with a forced re-login on 401
+        try:
+            resp = requests.post(
+                f"{API_BASE}/agent",
+                headers={"Content-Type": "application/json",
+                         "Authorization": f"Bearer {_get_token(force_refresh=attempt)}"},
+                data=json.dumps({"message": message, "trace": trace}),
+                timeout=60,
+            )
+            if resp.status_code == 401 and not attempt:
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as e:
+            return {"type": "error", "answer": f"Agent error: {e}"}
+    return {"type": "error", "answer": "Agent error: could not authenticate with PolicyBot API"}
+
 
 def format_result(payload: dict):
     # Pretty output for Slack (markdown + code block for JSON bits)

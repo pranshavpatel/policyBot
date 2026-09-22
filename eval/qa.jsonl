@@ -1,0 +1,45 @@
+{"q": "How many PTO days do full-time employees get in Year 1?", "must_contain": ["15"], "must_not": ["20", "25"], "source": "leave_policy.md"}
+{"q": "How many PTO days do employees get in Year 2 or Year 3?", "must_contain": ["20"], "must_not": ["15 days", "25 days"], "source": "leave_policy.md"}
+{"q": "How many PTO days do employees with 4+ years of tenure get?", "must_contain": ["25"], "must_not": ["15 days", "20 days"], "source": "leave_policy.md"}
+{"q": "How many unused PTO days can I carry over into next year?", "must_contain": ["5"], "must_not": ["10"], "source": "leave_policy.md"}
+{"q": "By when must carried-over PTO be used?", "must_contain": ["june 30"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many calendar days in advance must a leave request be submitted?", "must_contain": ["7"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many paid sick days do employees get per year?", "must_contain": ["10"], "must_not": ["15", "5 days"], "source": "leave_policy.md"}
+{"q": "After how many consecutive sick days is a doctor's note required?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
+{"q": "Can unused sick leave carry over to the next year?", "must_contain": ["cannot"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many weeks of paid parental leave do eligible employees get?", "must_contain": ["12"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How far in advance must parental leave be requested when foreseeable?", "must_contain": ["30"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many paid bereavement days are employees entitled to?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many working days of pay does jury duty provide?", "must_contain": ["10"], "must_not": [], "source": "leave_policy.md"}
+{"q": "After how many days of employment are full-time employees eligible for PTO?", "must_contain": ["30"], "must_not": [], "source": "leave_policy.md"}
+{"q": "Are contractors eligible for PTO?", "must_contain": ["not eligible"], "must_not": [], "source": "leave_policy.md"}
+{"q": "Do part-time employees accrue PTO at the same rate as full-time employees?", "must_contain": ["half"], "must_not": [], "source": "leave_policy.md"}
+{"q": "What federal law regarding leave does the company comply with?", "must_contain": ["fmla"], "must_not": [], "source": "leave_policy.md"}
+{"q": "When do health, dental, and vision benefits begin for new employees?", "must_contain": ["day 1"], "must_not": [], "source": "benefits_overview.md"}
+{"q": "What percentage does the company match for 401(k)?", "must_contain": ["4%"], "must_not": ["6%"], "source": "benefits_overview.md"}
+{"q": "How much is the monthly wellness stipend?", "must_contain": ["$50"], "must_not": ["$100"], "source": "benefits_overview.md"}
+{"q": "What is the annual learning budget for approved courses?", "must_contain": ["1,000"], "must_not": [], "source": "benefits_overview.md"}
+{"q": "What kinds of expenses qualify for reimbursement?", "must_contain": ["travel"], "must_not": [], "source": "reimbursement_policy.md"}
+{"q": "How many days do I have to submit expenses in the Finance tool?", "must_contain": ["30"], "must_not": [], "source": "reimbursement_policy.md"}
+{"q": "How soon is reimbursement typically issued after approval?", "must_contain": ["10 business days"], "must_not": [], "source": "reimbursement_policy.md"}
+{"q": "Is manager approval required to get reimbursed for expenses?", "must_contain": ["required"], "must_not": [], "source": "reimbursement_policy.md"}
+{"q": "What is the minimum required password length?", "must_contain": ["12"], "must_not": [], "source": "password_policy.md"}
+{"q": "How often must I change my password?", "must_contain": ["90 days"], "must_not": [], "source": "password_policy.md"}
+{"q": "How many of my last passwords can I not reuse?", "must_contain": ["5"], "must_not": [], "source": "password_policy.md"}
+{"q": "What character types must a password contain?", "must_contain": ["uppercase"], "must_not": [], "source": "password_policy.md"}
+{"q": "Within how many hours must I report a lost company laptop?", "must_contain": ["24"], "must_not": [], "source": "device_policy.md"}
+{"q": "What should I use when working offsite on my company laptop?", "must_contain": ["vpn"], "must_not": [], "source": "device_policy.md"}
+{"q": "How do I reset a forgotten VPN password?", "must_contain": ["forgot password"], "must_not": [], "source": "vpn_reset.md"}
+{"q": "How long should I wait for a VPN password reset to sync?", "must_contain": ["15 minutes"], "must_not": [], "source": "vpn_reset.md"}
+{"q": "Who do I contact if my VPN reset still isn't working?", "must_contain": ["it-support"], "must_not": [], "source": "vpn_reset.md"}
+{"q": "What authentication step is required during a VPN password reset?", "must_contain": ["mfa"], "must_not": [], "source": "vpn_reset.md"}
+{"q": "How many vacation days do interns accrue?", "must_contain": ["not eligible"], "must_not": [], "source": "leave_policy.md"}
+{"q": "What is the company's PTO carryover deadline and limit?", "must_contain": ["5"], "must_not": [], "source": "leave_policy.md"}
+{"q": "FMLA", "must_contain": ["fmla"], "must_not": [], "source": "leave_policy.md"}
+{"q": "MDM", "must_contain": ["mdm"], "must_not": [], "source": "device_policy.md"}
+{"q": "What is the company's stock ticker symbol?", "must_contain": ["have that in the policy"], "must_not": [], "source": null}
+{"q": "What is the CEO's salary?", "must_contain": ["have that in the policy"], "must_not": [], "source": null}
+{"q": "What is the office dress code?", "must_contain": ["have that in the policy"], "must_not": [], "source": null}
+{"q": "How much PTO do I get after 10 years at the company?", "must_contain": ["25"], "must_not": ["15 days"], "source": "leave_policy.md"}
+{"q": "If I've used 3 sick days to care for a family member, how many more can I use for that reason this year?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
+{"q": "Do I keep my PTO accrual while on unpaid leave?", "must_contain": ["does not accrue"], "must_not": [], "source": "leave_policy.md"}

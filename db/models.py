@@ -13,3 +13,14 @@ class LeaveRequest(Base):
     status = Column(String, index=True, nullable=False)   # submitted|approved|rejected|cancelled
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+    id = Column(String, primary_key=True)                 # uuid
+    actor = Column(String, index=True, nullable=False)     # username who performed the action
+    action = Column(String, index=True, nullable=False)    # create|approve|reject|cancel|login
+    target_type = Column(String, nullable=False)           # leave_request|auth
+    target_id = Column(String, index=True, nullable=False)
+    detail = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

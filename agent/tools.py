@@ -1,16 +1,45 @@
 # agent/tools.py
-from typing import Any, Dict, Callable, List
+from typing import Any, Dict, Callable, List, Optional
+import functools
 import requests
 from tools.doc_search import doc_search
 from tools.holiday_check import check_holiday
 from tools.leave_request import (
-    create_leave_request, list_leave_requests,
+    create_leave_request, list_leave_requests, get_leave_request,
     approve_leave_request, reject_leave_request, cancel_leave_request
 )
 from tools.qa_chain import build_qa_chain, ask
-_qa = build_qa_chain(k=5)
+from auth.authz import assert_can_create, assert_can_moderate, assert_can_cancel, PermissionDenied
+from auth.audit import write_audit
 
 ToolFn = Callable[[Dict[str, Any]], Dict[str, Any]]
+
+# Tools called from the chat agent (agent/react_agent.py) that touch leave
+# requests receive the authenticated caller as args["_actor"] = {"username",
+# "role"} rather than trusting a "user" field from the LLM's plan JSON — see
+# ACTOR_SCOPED_TOOLS in agent/react_agent.py. This mirrors the same
+# auth/authz.py rules the REST API enforces (api/app.py), so "ask the bot to
+# approve my own leave" is rejected the same way a direct API call is.
+
+def _require_actor(args: Dict[str, Any]) -> Dict[str, str]:
+    actor = args.get("_actor")
+    if not actor or not actor.get("username"):
+        raise PermissionDenied("Sign in required for this action.")
+    return actor
+
+
+def _as_tool_error(fn: ToolFn) -> ToolFn:
+    """Turns a PermissionDenied raised anywhere in an actor-scoped tool into
+    the same {"error": "..."} shape every other tool failure already uses
+    (e.g. "request not found" below), instead of letting it escape as a raw
+    exception that only run_agent's catch-all would translate."""
+    @functools.wraps(fn)
+    def wrapper(args: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            return fn(args)
+        except PermissionDenied as e:
+            return {"error": str(e)}
+    return wrapper
 
 # --- Safe HTTP tool (allowlist) ---
 ALLOW_HTTP = ("http://localhost:8000", "https://httpbin.org")
@@ -64,32 +93,67 @@ def tool_doc_search(args: Dict[str, Any]) -> Dict[str, Any]:
     q = args.get("query", "")
     return doc_search(q, k=int(args.get("k", 5)))
 
+@_as_tool_error
 def tool_create_leave(args: Dict[str, Any]) -> Dict[str, Any]:
+    actor = _require_actor(args)
+    # Always create on behalf of the authenticated caller, never a "user"
+    # field the LLM might have picked up from free text.
+    assert_can_create(actor["username"], actor["username"])
     req = create_leave_request(
-        user=args["user"],
+        user=actor["username"],
         start_date=args["start_date"],
         end_date=args["end_date"],
         reason=args["reason"],
     )
+    write_audit(actor=actor["username"], action="create", target_type="leave_request", target_id=req["id"])
     return {"created": req}
 
 
+@_as_tool_error
 def tool_list_leave(args: Dict[str, Any]) -> Dict[str, Any]:
+    actor = _require_actor(args)
     user = _clean_user(args.get("user"))
+    # Employees may only ever list their own requests.
+    if actor["role"] != "manager":
+        user = actor["username"]
     status = args.get("status")
     if isinstance(status, str):
         status = STATUS_ALIASES.get(status.lower().strip(), status.lower().strip())
     rows = list_leave_requests(user=user, status=status)
     return {"requests": rows, "count": len(rows)}
 
+@_as_tool_error
 def tool_approve_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    return approve_leave_request(args["id"])
+    actor = _require_actor(args)
+    row = get_leave_request(args["id"])
+    if not row:
+        return {"error": "request not found", "id": args["id"]}
+    assert_can_moderate(actor["username"], actor["role"], row["user"])
+    out = approve_leave_request(args["id"])
+    write_audit(actor=actor["username"], action="approve", target_type="leave_request", target_id=args["id"])
+    return out
 
+@_as_tool_error
 def tool_reject_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    return reject_leave_request(args["id"])
+    actor = _require_actor(args)
+    row = get_leave_request(args["id"])
+    if not row:
+        return {"error": "request not found", "id": args["id"]}
+    assert_can_moderate(actor["username"], actor["role"], row["user"])
+    out = reject_leave_request(args["id"])
+    write_audit(actor=actor["username"], action="reject", target_type="leave_request", target_id=args["id"])
+    return out
 
+@_as_tool_error
 def tool_cancel_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    return cancel_leave_request(args["id"])
+    actor = _require_actor(args)
+    row = get_leave_request(args["id"])
+    if not row:
+        return {"error": "request not found", "id": args["id"]}
+    assert_can_cancel(actor["username"], actor["role"], row["user"])
+    out = cancel_leave_request(args["id"])
+    write_audit(actor=actor["username"], action="cancel", target_type="leave_request", target_id=args["id"])
+    return out
 
 def tool_check_holiday(args: Dict[str, Any]) -> Dict[str, Any]:
     return {"result": check_holiday(args["date_str"])}
@@ -103,11 +167,11 @@ TOOLS: Dict[str, Dict[str, Any]] = {
         "fn": tool_doc_search,
     },
     "create_leave_request": {
-        "description": "Create a leave request (user, start_date, end_date, reason).",
+        "description": "Create a leave request for the current signed-in user (start_date, end_date, reason).",
         "schema": {"type":"object","properties":{
-            "user":{"type":"string"},"start_date":{"type":"string"},
+            "start_date":{"type":"string"},
             "end_date":{"type":"string"},"reason":{"type":"string"}},
-            "required":["user","start_date","end_date","reason"]},
+            "required":["start_date","end_date","reason"]},
         "fn": tool_create_leave,
     },
     "check_holiday": {
@@ -145,19 +209,11 @@ TOOLS["rag_answer"] = {
     "fn": tool_rag_answer,
 }
 
-def tool_list_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    user = args.get("user")
-    rows = list_leave_requests(user)
-    return {"requests": rows, "count": len(rows)}
-
 TOOLS["list_leave_requests"] = {
     "description": "List leave requests; optional filters: user, status(submitted|approved|rejected|cancelled).",
     "schema": {"type":"object","properties":{"user":{"type":"string"},"status":{"type":"string"}}, "required":[]},
     "fn": tool_list_leave,
 }
-
-def tool_cancel_leave(args: Dict[str, Any]) -> Dict[str, Any]:
-    return cancel_leave_request(args["id"])
 
 TOOLS["cancel_leave_request"] = {
     "description": "Cancel a leave request by id.",

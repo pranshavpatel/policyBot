@@ -1,9 +1,13 @@
 # agent/react_agent.py
 import json
+import time
 from typing import Any, Dict, List, Optional
 from langchain_groq import ChatGroq
 from config import GROQ_API_KEY, GROQ_MODEL
 from .tools import TOOLS
+from observability import get_logger, log_event
+
+log = get_logger("agent")
 
 PLANNER_PROMPT = """You are a helpful assistant with tools.
 Decide the NEXT best action. Output strict JSON only.
@@ -40,8 +44,19 @@ Most recent tool name: {tool_name}
 Most recent tool output (JSON): {tool_output}
 """
 
+# Tools that act on behalf of a specific identity: the caller's authenticated
+# actor is injected into args (as "_actor") rather than trusted from the
+# LLM's plan JSON, so chat-driven actions go through the same authz rules
+# as the REST API (see auth/authz.py, agent/tools.py).
+ACTOR_SCOPED_TOOLS = {
+    "create_leave_request", "approve_leave_request", "reject_leave_request",
+    "cancel_leave_request", "list_leave_requests",
+}
+
+
 def _llm():
     return ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0)
+
 
 def _tools_description():
     lines = []
@@ -49,14 +64,28 @@ def _tools_description():
         lines.append(f"- {name}: {spec['description']}; schema={json.dumps(spec['schema'])}")
     return "\n".join(lines)
 
+
+def _token_usage(ai_message) -> Optional[Dict[str, Any]]:
+    meta = getattr(ai_message, "response_metadata", None) or {}
+    usage = meta.get("token_usage")
+    if not usage:
+        return None
+    return {k: usage.get(k) for k in ("prompt_tokens", "completion_tokens", "total_tokens") if k in usage}
+
+
 def plan_step(user_msg: str) -> Dict[str, Any]:
     llm = _llm()
     prompt = PLANNER_PROMPT.format(tools=_tools_description(), user_msg=user_msg)
-    out = llm.invoke(prompt).content.strip()
+    t0 = time.perf_counter()
+    msg = llm.invoke(prompt)
+    latency_ms = round((time.perf_counter() - t0) * 1000, 1)
+    log_event(log, "llm_call", stage="plan", latency_ms=latency_ms, tokens=_token_usage(msg))
+    out = msg.content.strip()
     try:
         return json.loads(out)
     except Exception:
-        return {"action":"final","answer":"Sorry, I couldn't parse a plan. Please rephrase."}
+        return {"action": "final", "answer": "Sorry, I couldn't parse a plan. Please rephrase."}
+
 
 def synthesize(user_msg: str, tool_name: str, tool_output: Dict[str, Any]) -> str:
     llm = _llm()
@@ -65,14 +94,23 @@ def synthesize(user_msg: str, tool_name: str, tool_output: Dict[str, Any]) -> st
         tool_name=tool_name,
         tool_output=json.dumps(tool_output, ensure_ascii=False)[:6000],
     )
-    out = llm.invoke(prompt).content.strip()
+    t0 = time.perf_counter()
+    msg = llm.invoke(prompt)
+    latency_ms = round((time.perf_counter() - t0) * 1000, 1)
+    log_event(log, "llm_call", stage="synthesize", latency_ms=latency_ms, tokens=_token_usage(msg))
+    out = msg.content.strip()
     try:
-        return json.loads(out).get("final_answer","")
+        return json.loads(out).get("final_answer", "")
     except Exception:
         return "Here is what I found: " + str(tool_output)[:500]
 
-def run_agent(user_msg: str, max_steps: int = 3) -> Dict[str, Any]:
+
+def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: int = 3) -> Dict[str, Any]:
     """
+    actor: {"username": "...", "role": "employee"|"manager"} of the authenticated
+           caller, or None for unauthenticated/system use (e.g. tests hitting
+           rag_answer/check_holiday only — actor-scoped tools will reject None).
+
     Returns:
       {
         "type": "final",
@@ -81,7 +119,7 @@ def run_agent(user_msg: str, max_steps: int = 3) -> Dict[str, Any]:
         "trace": [
           {"step":1,"plan":{...}},
           {"step":1,"tool_call":{"name":"...","args":{...}}},
-          {"step":1,"observation":{...}},
+          {"step":1,"observation":{...}, "latency_ms": ...},
           ...
         ]
       }
@@ -90,17 +128,21 @@ def run_agent(user_msg: str, max_steps: int = 3) -> Dict[str, Any]:
     last_obs: Optional[Dict[str, Any]] = None
     last_tool_name: Optional[str] = None
     context_for_planner = user_msg
+    run_t0 = time.perf_counter()
 
     for step in range(1, max_steps + 1):
         plan = plan_step(context_for_planner)
         trace.append({"step": step, "plan": plan})
 
         if plan.get("action") == "final":
-            return {"type": "final", "answer": plan.get("answer",""), "steps": step, "trace": trace}
+            total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
+            log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=step,
+                      total_latency_ms=total_ms, outcome="final_no_tool")
+            return {"type": "final", "answer": plan.get("answer", ""), "steps": step, "trace": trace}
 
         if plan.get("action") == "tool":
             name = plan.get("name")
-            args = plan.get("args", {})
+            args = dict(plan.get("args", {}) or {})
             tool = TOOLS.get(name)
             if not tool:
                 err = {"error": f"Unknown tool '{name}'."}
@@ -108,13 +150,20 @@ def run_agent(user_msg: str, max_steps: int = 3) -> Dict[str, Any]:
                 trace.append({"step": step, "observation": err})
                 return {"type": "final", "answer": err["error"], "steps": step, "trace": trace}
 
-            trace.append({"step": step, "tool_call": {"name": name, "args": args}})
+            if name in ACTOR_SCOPED_TOOLS:
+                args["_actor"] = actor
+
+            trace.append({"step": step, "tool_call": {"name": name, "args": {k: v for k, v in args.items() if k != "_actor"}}})
+            tool_t0 = time.perf_counter()
             try:
                 obs = tool["fn"](args)
             except Exception as e:
                 obs = {"error": str(e)}
+            tool_latency_ms = round((time.perf_counter() - tool_t0) * 1000, 1)
+            log_event(log, "tool_call", name=name, latency_ms=tool_latency_ms,
+                      ok=("error" not in obs) if isinstance(obs, dict) else True)
 
-            trace.append({"step": step, "observation": obs})
+            trace.append({"step": step, "observation": obs, "latency_ms": tool_latency_ms})
             last_obs = obs
             last_tool_name = name
             # feed observation back to planner context
@@ -127,9 +176,14 @@ def run_agent(user_msg: str, max_steps: int = 3) -> Dict[str, Any]:
         return {"type": "final", "answer": err, "steps": step, "trace": trace}
 
     # step limit reached → synthesize with last observation if any
+    total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
     if last_obs is not None and last_tool_name is not None:
         final = synthesize(user_msg, last_tool_name, last_obs)
         trace.append({"synthesis": {"from_tool": last_tool_name}})
+        log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=max_steps,
+                  total_latency_ms=total_ms, outcome="synthesized")
         return {"type": "final", "answer": final, "steps": max_steps, "trace": trace}
 
-    return {"type":"final","answer":"I couldn't decide on a next action.","steps": max_steps, "trace": trace}
+    log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=max_steps,
+              total_latency_ms=total_ms, outcome="undecided")
+    return {"type": "final", "answer": "I couldn't decide on a next action.", "steps": max_steps, "trace": trace}

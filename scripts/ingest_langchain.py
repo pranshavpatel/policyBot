@@ -1,7 +1,6 @@
 from pathlib import Path
 from rag.splitter import split_markdown
 from rag.vectorstore import upsert_documents
-from config_paths import VECTORSTORE_DIR, CHROMA_COLLECTION, EMBED_MODEL
 
 def main():
     data_dir = Path("data/policies")

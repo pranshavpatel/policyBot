@@ -42,3 +42,25 @@ def test_configured_retriever_respects_retrieval_mode(monkeypatch):
     from rag.hybrid_retriever import HybridRetriever
     r = retrieval.get_configured_retriever(k=2)
     assert isinstance(r, HybridRetriever)
+
+
+def test_configured_retriever_respects_rerank_toggle(monkeypatch):
+    import config
+    import rag.retrieval as retrieval
+    from rag.reranker import RerankingRetriever
+
+    monkeypatch.setattr(config, "RERANK_ENABLED", True)
+    monkeypatch.setattr(retrieval, "RERANK_ENABLED", True)
+    r = retrieval.get_configured_retriever(k=2)
+    assert isinstance(r, RerankingRetriever)
+
+
+def test_reranking_finds_pto_accrual_chunk_with_real_model():
+    # End-to-end with the real cross-encoder (downloads on first use if not
+    # already cached) — confirms the actual wiring, not just the sorting
+    # logic tests/test_reranker.py already covers with a fake model.
+    from rag.vectorstore import get_retriever
+    from rag.reranker import RerankingRetriever
+    r = RerankingRetriever(get_retriever(k=10), top_k=3, fetch_k=10)
+    docs = r.invoke("How many PTO days do I get in Year 1?")
+    assert any("15 days" in d.page_content for d in docs)

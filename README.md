@@ -100,13 +100,13 @@ This was verified end-to-end against a live server, not just unit-tested — see
 
 ---
 
-## Retrieval quality: dense vs. hybrid
+## Retrieval quality: dense, hybrid, and cross-encoder reranking
 
-`RETRIEVAL_MODE=dense|hybrid` in `.env` toggles between pure embedding search and BM25+dense fused with Reciprocal Rank Fusion (`rag/hybrid_retriever.py`). `scripts/eval_retrieval.py` reports standard IR ranking metrics — Recall@k, Precision@k, and MRR — not just a binary hit-rate; see the script's docstring for why those three and not NDCG. Measure it yourself:
+`RETRIEVAL_MODE=dense|hybrid` in `.env` toggles between pure embedding search and BM25+dense fused with Reciprocal Rank Fusion (`rag/hybrid_retriever.py`); `RERANK_ENABLED=true` adds a cross-encoder reranking stage on top of whichever mode is active (`rag/reranker.py`) — a second-stage model that scores each (query, chunk) *pair* jointly, instead of comparing independently-computed embeddings, at the cost of one forward pass per candidate instead of a single batched similarity lookup. `scripts/eval_retrieval.py` reports standard IR ranking metrics — Recall@k, Precision@k, and MRR — not just a binary hit-rate; see the script's docstring for why those three and not NDCG. Measure it yourself:
 
 ```bash
 python -m scripts.ingest_langchain
-python -m scripts.eval_retrieval eval/qa.jsonl --k 1 --k 3 --k 5 --show-misses
+python -m scripts.eval_retrieval eval/qa.jsonl --k 1 --k 3 --k 5 --rerank --show-misses
 ```
 
 Measured on this repo's actual corpus (6 docs / 21 chunks, 42 source-labeled questions in `eval/qa.jsonl`):
@@ -119,6 +119,19 @@ Measured on this repo's actual corpus (6 docs / 21 chunks, 42 source-labeled que
 **Honest reading:** MRR=1.0 for both means the correct doc isn't just *somewhere* in the top-k, it's ranked #1 every single time — this corpus doesn't discriminate the two retrievers even on ranking quality, not just presence. That's an expected result of a 21-chunk corpus where each policy topic maps almost 1:1 to a single source document, not a null finding for hybrid: the value of lexical (BM25) retrieval shows up on **exact-term queries** — bare acronyms, policy numbers, IDs — where embedding similarity can be inconsistent even when it isn't here. `eval/qa.jsonl` includes bare acronym queries (`FMLA`, `MDM`) specifically to probe this; both retrievers currently handle them correctly on this small corpus, but hybrid is the one with a mechanism (exact lexical match) guaranteeing it rather than a happy accident of the corpus being small and clean. At a larger scale, or with more topically-overlapping documents, expect dense-only to show a real gap — and Precision@k dropping as k grows (33.3% at k=3, 20% at k=5) is the metric actually earning its keep here: it's mechanically expected with one relevant doc per query, and it's what would catch a retriever that pads out top-k with irrelevant chunks on a real, larger corpus where Recall@k alone can't see that cost.
 
 One real bug the hybrid path surfaced along the way: `BM25Retriever`'s default tokenizer is plain `str.split()` — no lowercasing, no punctuation stripping — so a query for `FMLA` never matched `(FMLA).` in the corpus. Fixed with a proper word-boundary tokenizer (`rag/hybrid_retriever.py::_tokenize`); regression-tested in `tests/test_retrieval.py`.
+
+**Reranking**, measured the same way (`--rerank`, `cross-encoder/ms-marco-MiniLM-L-6-v2`):
+
+| Mode | MRR | Added latency/query (steady-state) |
+|---|---|---|
+| Dense | 1.0 | — |
+| Hybrid | 1.0 | — |
+| Dense + rerank | 1.0 | +29ms |
+| Hybrid + rerank | 1.0 | +23ms |
+
+No accuracy change here either — same root cause as dense vs. hybrid above, this corpus is too small and too cleanly separated to need a second-stage reranker to pick the right document out of a crowded field. The real cost is real, though: reranking adds a genuine ~25-30ms/query on top of a first-stage retriever that was already under 20ms, because it's a forward pass per candidate rather than a single similarity lookup — small on 10-15 candidates, but it's the number that would matter at a larger `RERANK_CANDIDATES` or on a slower CPU. There's also a one-time ~1s model-load-and-warmup cost per process (`RerankingRetriever`'s first call downloads/loads the ~90MB cross-encoder and pays an extra slow first inference on top of that) — `scripts/eval_retrieval.py --rerank` warms the model before timing anything, the same way you'd warm it before serving real traffic, so the numbers above are steady-state, not skewed by that one-time cost.
+
+Where reranking *would* earn its keep here, even without moving the doc-level metrics above: `leave_policy.md` alone splits into 14 chunks, and Recall/Precision/MRR only check whether the right *document* was retrieved, not whether the single best-matching *chunk within* it was ranked first — a real chunk-level signal this eval set doesn't currently label (it has one relevant doc per question, not one relevant chunk). That's the honest gap: on a corpus with less topic-to-document overlap, or with chunk-level relevance labels, this comparison would likely look different, and the reranker exists in this repo now specifically so that measurement is one `--rerank` flag away instead of a rewrite.
 
 ---
 

@@ -102,21 +102,21 @@ This was verified end-to-end against a live server, not just unit-tested — see
 
 ## Retrieval quality: dense vs. hybrid
 
-`RETRIEVAL_MODE=dense|hybrid` in `.env` toggles between pure embedding search and BM25+dense fused with Reciprocal Rank Fusion (`rag/hybrid_retriever.py`). Measure it yourself:
+`RETRIEVAL_MODE=dense|hybrid` in `.env` toggles between pure embedding search and BM25+dense fused with Reciprocal Rank Fusion (`rag/hybrid_retriever.py`). `scripts/eval_retrieval.py` reports standard IR ranking metrics — Recall@k, Precision@k, and MRR — not just a binary hit-rate; see the script's docstring for why those three and not NDCG. Measure it yourself:
 
 ```bash
 python -m scripts.ingest_langchain
-python -m scripts.eval_retrieval eval/qa.jsonl --k 3
+python -m scripts.eval_retrieval eval/qa.jsonl --k 1 --k 3 --k 5 --show-misses
 ```
 
 Measured on this repo's actual corpus (6 docs / 21 chunks, 42 source-labeled questions in `eval/qa.jsonl`):
 
-| Mode | Hit-rate @k=1 | Hit-rate @k=3 |
-|---|---|---|
-| Dense | 42/42 = 100% | 42/42 = 100% |
-| Hybrid | 42/42 = 100% | 42/42 = 100% |
+| Mode | MRR | Recall@1 | Precision@1 | Recall@3 | Precision@3 | Recall@5 | Precision@5 |
+|---|---|---|---|---|---|---|---|
+| Dense | 1.0 | 100% | 100% | 100% | 33.3% | 100% | 20.0% |
+| Hybrid | 1.0 | 100% | 100% | 100% | 33.3% | 100% | 20.0% |
 
-**Honest reading:** on this corpus, dense retrieval alone already nails it — each policy topic maps almost 1:1 to a single source document, so there's no ambiguity for embeddings to get wrong. That's an expected result, not a null finding for hybrid: the value of lexical (BM25) retrieval shows up on **exact-term queries** — bare acronyms, policy numbers, IDs — where embedding similarity can be inconsistent even when it isn't here. `eval/qa.jsonl` includes bare acronym queries (`FMLA`, `MDM`) specifically to probe this; both retrievers currently handle them correctly on this small corpus, but hybrid is the one with a mechanism (exact lexical match) guaranteeing it rather than a happy accident of the corpus being small and clean. At a larger scale, or with more topically-overlapping documents, expect dense-only to show a real gap.
+**Honest reading:** MRR=1.0 for both means the correct doc isn't just *somewhere* in the top-k, it's ranked #1 every single time — this corpus doesn't discriminate the two retrievers even on ranking quality, not just presence. That's an expected result of a 21-chunk corpus where each policy topic maps almost 1:1 to a single source document, not a null finding for hybrid: the value of lexical (BM25) retrieval shows up on **exact-term queries** — bare acronyms, policy numbers, IDs — where embedding similarity can be inconsistent even when it isn't here. `eval/qa.jsonl` includes bare acronym queries (`FMLA`, `MDM`) specifically to probe this; both retrievers currently handle them correctly on this small corpus, but hybrid is the one with a mechanism (exact lexical match) guaranteeing it rather than a happy accident of the corpus being small and clean. At a larger scale, or with more topically-overlapping documents, expect dense-only to show a real gap — and Precision@k dropping as k grows (33.3% at k=3, 20% at k=5) is the metric actually earning its keep here: it's mechanically expected with one relevant doc per query, and it's what would catch a retriever that pads out top-k with irrelevant chunks on a real, larger corpus where Recall@k alone can't see that cost.
 
 One real bug the hybrid path surfaced along the way: `BM25Retriever`'s default tokenizer is plain `str.split()` — no lowercasing, no punctuation stripping — so a query for `FMLA` never matched `(FMLA).` in the corpus. Fixed with a proper word-boundary tokenizer (`rag/hybrid_retriever.py::_tokenize`); regression-tested in `tests/test_retrieval.py`.
 

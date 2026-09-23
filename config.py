@@ -21,6 +21,18 @@ CHROMA_DIR = os.getenv("CHROMA_DIR", "vectorstore/chroma_policybot")
 # Retrieval: "dense" (pure vector search) or "hybrid" (BM25 + dense, ensembled)
 RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "dense")
 
+# Cross-encoder reranking: retrieve RERANK_CANDIDATES candidates from
+# whichever RETRIEVAL_MODE is configured, score each (query, chunk) pair
+# with a cross-encoder, and keep only the top k after reranking. Off by
+# default — it's a real CPU/latency cost (a forward pass per candidate,
+# not a single batched embedding lookup) and a ~90MB model download on
+# first use, so it shouldn't turn on silently for everyone running the
+# default config. See rag/reranker.py for why a cross-encoder over just
+# using the dense retriever's own similarity score.
+RERANK_ENABLED = os.getenv("RERANK_ENABLED", "false").lower() == "true"
+RERANK_MODEL = os.getenv("RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "15"))
+
 # Auth (JWT)
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-insecure-secret-change-me")
 JWT_ALGORITHM = "HS256"

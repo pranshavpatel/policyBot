@@ -30,7 +30,11 @@ NDCG would collapse to the same information MRR already gives.
 
 Usage:
     python -m scripts.ingest_langchain          # build the vectorstore first
-    python -m scripts.eval_retrieval [eval/qa.jsonl] [--k 1 --k 3 --k 5]
+    python -m scripts.eval_retrieval [eval/qa.jsonl] [--k 1 --k 3 --k 5] [--rerank]
+
+--rerank additionally reports dense+cross-encoder and hybrid+cross-encoder
+(rag/reranker.py), so you can see whether reranking earns its extra
+latency on top of whichever first-stage retriever you're already running.
 """
 import argparse
 import json
@@ -39,6 +43,7 @@ import time
 
 from rag.vectorstore import get_retriever
 from rag.hybrid_retriever import get_hybrid_retriever
+from rag.reranker import RerankingRetriever
 
 MRR_CUTOFF = 10  # how deep to look for the correct doc when computing MRR
 
@@ -113,20 +118,44 @@ def main():
     parser.add_argument("--k", type=int, action="append", dest="ks",
                          help="report Recall@k/Precision@k for this k (repeatable; default 1,3,5)")
     parser.add_argument("--show-misses", action="store_true", help="list queries missed at the largest k")
+    parser.add_argument("--rerank", action="store_true",
+                         help="also report dense/hybrid + cross-encoder reranking (rag/reranker.py)")
     args = parser.parse_args()
     ks = sorted(set(args.ks)) if args.ks else [1, 3, 5]
+    fetch_k = max(max(ks), MRR_CUTOFF)
 
     rows = load_labeled_questions(args.path)
     print(f"Loaded {len(rows)} source-labeled questions from {args.path}\n")
 
-    dense = get_retriever(k=max(max(ks), MRR_CUTOFF))
+    dense = get_retriever(k=fetch_k)
     dense_result = evaluate(dense, rows, ks)
-    _print_report("Dense ", dense_result, ks)
+    _print_report("Dense           ", dense_result, ks)
 
     print()
-    hybrid = get_hybrid_retriever(k=max(max(ks), MRR_CUTOFF), fetch_k=max(10, max(ks) * 3))
+    hybrid = get_hybrid_retriever(k=fetch_k, fetch_k=max(10, max(ks) * 3))
     hybrid_result = evaluate(hybrid, rows, ks)
-    _print_report("Hybrid", hybrid_result, ks)
+    _print_report("Hybrid          ", hybrid_result, ks)
+
+    if args.rerank:
+        # Cross-encoder model load + first-inference warmup is a one-time
+        # ~1s CPU cost (see rag/reranker.py's docstring) that has nothing
+        # to do with per-query retrieval latency — warm it here, the way
+        # you'd warm a model before serving real traffic, so the timed
+        # runs below report steady-state cost instead of the average
+        # being skewed by whichever retriever happens to run first.
+        from rag.reranker import rerank as _warm_rerank
+        _warm_rerank("warmup", dense.invoke("warmup")[:1], 1)
+
+        print()
+        dense_rerank = RerankingRetriever(get_retriever(k=fetch_k), top_k=fetch_k, fetch_k=fetch_k)
+        dense_rerank_result = evaluate(dense_rerank, rows, ks)
+        _print_report("Dense + rerank  ", dense_rerank_result, ks)
+
+        print()
+        hybrid_rerank = RerankingRetriever(
+            get_hybrid_retriever(k=fetch_k, fetch_k=max(10, max(ks) * 3)), top_k=fetch_k, fetch_k=fetch_k)
+        hybrid_rerank_result = evaluate(hybrid_rerank, rows, ks)
+        _print_report("Hybrid + rerank ", hybrid_rerank_result, ks)
 
     if args.show_misses:
         largest_k = max(ks)

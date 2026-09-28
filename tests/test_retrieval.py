@@ -64,3 +64,45 @@ def test_reranking_finds_pto_accrual_chunk_with_real_model():
     r = RerankingRetriever(get_retriever(k=10), top_k=3, fetch_k=10)
     docs = r.invoke("How many PTO days do I get in Year 1?")
     assert any("15 days" in d.page_content for d in docs)
+
+
+@pytest.mark.parametrize("query", [
+    "How do I reset a forgotten VPN password?",
+    "Who do I contact if my VPN reset still isn't working?",
+])
+def test_reranking_ranks_vpn_reset_first_over_its_own_cross_reference(query):
+    # Regression test for a real miss found via scripts/eval_retrieval.py
+    # on the expanded (26-doc) corpus: dense retrieval alone ranked
+    # remote_access_policy.md's one-line cross-reference ("For a forgotten
+    # VPN password, follow the steps in VPN Reset") ABOVE vpn_reset.md's
+    # actual numbered steps, because that cross-reference sentence
+    # lexically echoes the query almost word-for-word — a bi-encoder
+    # comparing independently-computed embeddings has no way to notice
+    # it's a pointer, not an answer. The cross-encoder reranker (scoring
+    # the (query, chunk) pair jointly) correctly promotes vpn_reset.md to
+    # rank 1; this asserts that guarantee holds, not dense's specific
+    # wrong behavior (which is a softer, more change-tolerant regression
+    # signal — see README's "Retrieval quality" section for the full
+    # measured comparison).
+    from rag.vectorstore import get_retriever
+    from rag.reranker import RerankingRetriever
+    r = RerankingRetriever(get_retriever(k=10), top_k=1, fetch_k=10)
+    docs = r.invoke(query)
+    assert docs[0].metadata.get("source") == "vpn_reset.md"
+
+
+def test_multi_source_question_matches_either_labeled_doc():
+    # eval/qa.jsonl labels some questions with more than one correct source
+    # doc — genuine overlap, not an eval-authoring mistake (e.g. Leave
+    # Policy's parental-leave summary and the dedicated Parental Leave
+    # Policy both correctly answer this). Confirm retrieval finds at least
+    # one of them, and that scripts/eval_retrieval.py's rank helper (which
+    # the real eval run relies on) handles a list source correctly against
+    # real retrieval output, not just the stub retriever in
+    # tests/test_eval_retrieval_metrics.py.
+    from rag.hybrid_retriever import get_hybrid_retriever
+    from scripts.eval_retrieval import _rank_of_first_relevant
+
+    docs = get_hybrid_retriever(k=5).invoke("How many weeks of paid parental leave do eligible employees get?")
+    rank = _rank_of_first_relevant(docs, ["leave_policy.md", "parental_leave_policy.md"])
+    assert rank is not None

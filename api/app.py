@@ -1,8 +1,10 @@
 # api/app.py
 from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from groq import RateLimitError as GroqRateLimitError
 from pydantic import BaseModel
 from typing import Optional
 
@@ -49,6 +51,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RequestLoggingMiddleware)
+
+
+@app.exception_handler(GroqRateLimitError)
+async def _groq_rate_limit_handler(request: Request, exc: GroqRateLimitError):
+    # Without this, a Groq 429 bubbles up as our own generic 500 (FastAPI's
+    # default handler hides the real cause for security reasons), which is
+    # indistinguishable from an actual bug to a caller — and to
+    # scripts/eval_via_api.py, which needs to tell "back off and retry"
+    # apart from "something is broken" to run a large eval reliably. Found
+    # live: a 70-question eval run hit this partway through and every
+    # subsequent request failed with an opaque 500 until the process was
+    # restarted.
+    retry_after = getattr(getattr(exc, "response", None), "headers", {}).get("retry-after")
+    headers = {"Retry-After": retry_after} if retry_after else {}
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={"detail": "Upstream LLM provider rate limit hit — please retry shortly."},
+        headers=headers,
+    )
 
 qa = build_qa_chain(k=5)
 

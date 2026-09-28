@@ -6,10 +6,10 @@ PolicyBot is an HR assistant that answers policy questions over a RAG pipeline a
 
 - **FastAPI backend**, JWT auth + RBAC, structured JSON logging
 - **Hybrid (BM25 + dense) retrieval + cross-encoder reranking** over 26 HR/IT policy docs, with a lexical groundedness guardrail on generated answers
-- **ReAct-style chat agent** (Groq / Llama) that can also create/approve/reject/cancel leave requests as tool calls
+- **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM), that can also create/approve/reject/cancel leave requests as tool calls
 - **React + Tailwind frontend** for the chat UI
 - **Slack integration** via the Events API
-- **64-test pytest suite + GitHub Actions CI**
+- **72-test pytest suite + GitHub Actions CI**
 
 ---
 
@@ -165,6 +165,24 @@ Two things surfaced only by actually running this against a live model, both wor
 
 ---
 
+## LLM provider: Groq or local
+
+`LLM_PROVIDER=groq|local` in `.env` picks the chat model, through a single factory (`agent/llm.py`) both `agent/react_agent.py` and `tools/qa_chain.py` go through — the same "config flip, not a code change" pattern as `RETRIEVAL_MODE`. `local` works with any OpenAI-compatible server (Ollama, vLLM, llama.cpp's server) via `LOCAL_LLM_BASE_URL`.
+
+Why this exists, not just as a hypothetical: the Groq rate limit hit above is a real, live-encountered cost of a hosted API, and a local model has none. It's also a defensible privacy story specific to this project — policy and leave-request content never has to leave your own infrastructure, which matters more for an HR bot than for most chat demos.
+
+**Verified end-to-end, not just wired up**: ran the full authenticated `/agent` pipeline — login, ReAct planning, `rag_answer` tool call, groundedness check — against a real local model (`qwen3:8b` via Ollama) instead of Groq. *"How many PTO days in Year 1?"* correctly returned *"15 days"* in 72.6s. That number is CPU inference on a laptop with no GPU, not representative of real throughput — it's here to confirm correctness, not speed. Point `LOCAL_LLM_BASE_URL` at a reachable GPU workstation (LAN IP, Tailscale, SSH tunnel — setting up that network path is outside this project's scope) to get a real performance number; `tests/test_llm.py` only checks the provider-selection logic itself (CI has no GPU or Ollama to call out to), so a fresh benchmark against real hardware is a "run it and see" away, not a code change.
+
+Setup:
+```bash
+ollama pull qwen3:8b          # or point LOCAL_LLM_MODEL at whatever you have
+ollama serve                  # if not already running
+# .env: LLM_PROVIDER=local
+uvicorn api.app:app --reload --port 8000
+```
+
+---
+
 ## Observability
 
 `observability.py` emits one structured JSON line per HTTP request (method, path, status, latency, request id) and per agent step (LLM call latency + token usage where the model reports it, tool-call latency, per-run summary). Sample, captured from a real run:
@@ -178,7 +196,7 @@ Two things surfaced only by actually running this against a live model, both wor
 ## Testing
 
 ```bash
-pytest              # 64 tests: leave-request logic, holiday logic, authz rules,
+pytest              # 72 tests: leave-request logic, holiday logic, authz rules,
                      # groundedness, actor-scoped agent tools, full API RBAC flows,
                      # retrieval correctness (skipped if the vectorstore isn't built)
 ```

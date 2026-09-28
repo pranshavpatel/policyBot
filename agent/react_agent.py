@@ -3,8 +3,7 @@ import json
 import logging
 import time
 from typing import Any, Dict, List, Optional
-from langchain_groq import ChatGroq
-from config import GROQ_API_KEY, GROQ_MODEL
+from .llm import get_llm
 from .tools import TOOLS
 from observability import get_logger, log_event
 from rag.groundedness import check_groundedness, UNGROUNDED_FALLBACK
@@ -65,7 +64,7 @@ ACTOR_SCOPED_TOOLS = {
 
 
 def _llm():
-    return ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0)
+    return get_llm(temperature=0)
 
 
 def _tools_description():

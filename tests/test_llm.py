@@ -32,3 +32,16 @@ def test_temperature_is_passed_through(monkeypatch):
     monkeypatch.setattr(llm_module, "LLM_PROVIDER", "local")
     llm = get_llm(temperature=0.7)
     assert llm.temperature == 0.7
+
+
+def test_local_provider_bounds_every_call(monkeypatch):
+    # Regression: with no token cap and no timeout, one runaway qwen3
+    # generation hung a real eval run and, by queueing every later request
+    # behind it, the whole server (see config.py's LOCAL_LLM_* comment).
+    monkeypatch.setattr(llm_module, "LLM_PROVIDER", "local")
+    monkeypatch.setattr(llm_module, "LOCAL_LLM_MAX_TOKENS", 1234)
+    monkeypatch.setattr(llm_module, "LOCAL_LLM_TIMEOUT_SECONDS", 42.0)
+    llm = get_llm()
+    assert llm.max_tokens == 1234
+    assert llm.request_timeout == 42.0
+    assert llm.max_retries == 0

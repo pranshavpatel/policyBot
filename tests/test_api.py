@@ -1,6 +1,8 @@
-"""API-level tests via FastAPI's TestClient. Deliberately avoid /chat and
-/agent here — those call the real LLM (see tests/test_agent.py, which mocks
-it instead of skipping the code path entirely)."""
+"""API-level tests via FastAPI's TestClient. Deliberately avoid making real
+/chat or /agent calls (those hit the real LLM) — except for
+test_agent_rate_limit_surfaces_as_429_not_500 below, which monkeypatches
+run_agent to test the error-handling path around it without needing a real
+LLM call."""
 
 
 def test_login_success_and_failure(client):
@@ -104,3 +106,27 @@ def test_holidays_date_lookup_still_works(client):
 
 def test_health(client):
     assert client.get("/health").json() == {"status": "ok"}
+
+
+def test_agent_rate_limit_surfaces_as_429_not_500(client, auth_headers, monkeypatch):
+    # Regression test: a live 70-question eval run hit Groq's rate limit
+    # partway through, and without api/app.py's exception handler for
+    # groq.RateLimitError, every subsequent request failed with an opaque
+    # 500 (FastAPI's default handler hides the real cause) — indistinguishable
+    # from an actual bug to a caller or to scripts/eval_via_api.py's retry
+    # logic, which specifically needs a 429 to know to back off and retry.
+    import httpx
+    from groq import RateLimitError
+    import api.app as app_module
+
+    fake_response = httpx.Response(429, headers={"retry-after": "3"}, request=httpx.Request("POST", "http://x"))
+
+    def _raise_rate_limit(*args, **kwargs):
+        raise RateLimitError("rate limited", response=fake_response, body=None)
+
+    monkeypatch.setattr(app_module, "run_agent", _raise_rate_limit)
+
+    headers = auth_headers("alice", "employee")
+    r = client.post("/agent", json={"message": "How many PTO days?", "trace": False}, headers=headers)
+    assert r.status_code == 429
+    assert r.headers.get("retry-after") == "3"

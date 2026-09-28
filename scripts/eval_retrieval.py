@@ -10,23 +10,33 @@ server + GROQ_API_KEY) can't tell you on its own — a wrong final answer
 could be a retrieval miss OR a generation error, and only this script
 isolates the first half.
 
+Most questions in eval/qa.jsonl label exactly one correct source doc, but
+a "source" can also be a list — for questions that are genuinely
+ambiguous because two policies legitimately cover the same fact (e.g.
+Leave Policy's parental-leave summary and the dedicated Parental Leave
+Policy both correctly answer "how many weeks of parental leave"), any doc
+in that list counts as a hit.
+
 Metrics, and why these three specifically:
-- Recall@k: was the correct source doc anywhere in the top-k? Binary per
-  query here because eval/qa.jsonl labels exactly one relevant doc per
-  question — with only one relevant item, Recall@k and "hit rate" are the
-  same number, this just uses the standard IR name for it.
-- Precision@k: what fraction of the top-k were actually relevant? With one
-  relevant doc per query this is just hit/k, but it's what actually
-  penalizes a bloated k (retrieving 10 chunks to find 1 relevant one scores
-  worse on precision than retrieving 3, even though recall is identical) —
-  Recall@k alone can't tell you that trade-off.
-- MRR (Mean Reciprocal Rank): rewards ranking the correct doc 1st over 3rd,
-  which Recall@k/hit-rate genuinely cannot distinguish — on this corpus
-  Recall@k was maxed out at 100% and told us nothing about ranking quality
-  within that top-k; MRR is the fix for that blind spot.
+- Recall@k: was a correct source doc anywhere in the top-k? With exactly
+  one relevant doc per query this is binary and identical to "hit rate";
+  the multi-source questions are still binary per query (hit if *any*
+  labeled source appears), just with more than one way to score a hit.
+- Precision@k: what fraction of the top-k were actually relevant? This is
+  where single- vs multi-source questions genuinely differ — hit/k for a
+  single-source question, but a multi-source question could in principle
+  have more than one relevant chunk in the same top-k, so precision isn't
+  just an algebraic function of recall the way it is for single-source
+  questions. It's what penalizes a bloated k (retrieving 10 chunks to find
+  1 relevant one scores worse than retrieving 3) — Recall@k alone can't
+  see that trade-off.
+- MRR (Mean Reciprocal Rank): rewards ranking a correct doc 1st over 3rd,
+  which Recall@k/hit-rate genuinely cannot distinguish — MRR is the fix
+  for that blind spot.
 NDCG is intentionally not here: it needs graded relevance labels (0/1/2/3),
-and eval/qa.jsonl only has a single binary-relevant doc per question, so
-NDCG would collapse to the same information MRR already gives.
+and even the multi-source questions here are binary-relevant (a doc either
+answers the question or it doesn't, no partial credit), so NDCG would
+collapse to the same information MRR already gives.
 
 Usage:
     python -m scripts.ingest_langchain          # build the vectorstore first
@@ -61,10 +71,16 @@ def load_labeled_questions(path: str):
     return rows
 
 
-def _rank_of_first_relevant(docs, source: str):
-    """1-indexed rank of the first chunk whose source matches, or None."""
+def _rank_of_first_relevant(docs, sources):
+    """1-indexed rank of the first chunk whose source is a relevant doc, or
+    None. `sources` may be a single doc filename (the common case: one
+    genuinely correct source) or a list (a deliberately ambiguous question —
+    two policies legitimately cover the same fact, e.g. Leave Policy's
+    parental-leave summary and the dedicated Parental Leave Policy — either
+    is a correct retrieval, so eval/qa.jsonl labels both)."""
+    relevant = {sources} if isinstance(sources, str) else set(sources)
     for i, d in enumerate(docs):
-        if d.metadata.get("source") == source:
+        if d.metadata.get("source") in relevant:
             return i + 1
     return None
 

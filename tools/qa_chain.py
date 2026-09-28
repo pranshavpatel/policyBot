@@ -1,8 +1,7 @@
-from typing import Tuple, List
-from langchain_groq import ChatGroq
+from typing import Any, Tuple, List
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
-from config import GROQ_API_KEY, GROQ_MODEL
+from agent.llm import get_llm
 from rag.retrieval import get_configured_retriever
 from rag.groundedness import check_groundedness, UNGROUNDED_FALLBACK
 
@@ -29,7 +28,7 @@ class QAChain:
     currently-recommended pattern anyway.
     """
 
-    def __init__(self, llm: ChatGroq, retriever, prompt: PromptTemplate):
+    def __init__(self, llm: Any, retriever, prompt: PromptTemplate):
         self.llm = llm
         self.retriever = retriever
         self.prompt = prompt
@@ -53,7 +52,7 @@ class QAChain:
 
 
 def build_qa_chain(k: int = 5):
-    llm = ChatGroq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0)
+    llm = get_llm(temperature=0)
     retriever = get_configured_retriever(k=k)
     prompt = PromptTemplate(
         template=SYSTEM_PROMPT.strip(),

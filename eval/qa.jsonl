@@ -7,18 +7,18 @@
 {"q": "How many paid sick days do employees get per year?", "must_contain": ["10"], "must_not": ["15", "5 days"], "source": "leave_policy.md"}
 {"q": "After how many consecutive sick days is a doctor's note required?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
 {"q": "Can unused sick leave carry over to the next year?", "must_contain": ["cannot"], "must_not": [], "source": "leave_policy.md"}
-{"q": "How many weeks of paid parental leave do eligible employees get?", "must_contain": ["12"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many weeks of paid parental leave do eligible employees get?", "must_contain": ["12"], "must_not": [], "source": ["leave_policy.md", "parental_leave_policy.md"]}
 {"q": "How far in advance must parental leave be requested when foreseeable?", "must_contain": ["30"], "must_not": [], "source": "leave_policy.md"}
-{"q": "How many paid bereavement days are employees entitled to?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many paid bereavement days are employees entitled to?", "must_contain": ["3"], "must_not": [], "source": ["leave_policy.md", "bereavement_leave_policy.md"]}
 {"q": "How many working days of pay does jury duty provide?", "must_contain": ["10"], "must_not": [], "source": "leave_policy.md"}
 {"q": "After how many days of employment are full-time employees eligible for PTO?", "must_contain": ["30"], "must_not": [], "source": "leave_policy.md"}
 {"q": "Are contractors eligible for PTO?", "must_contain": ["not eligible"], "must_not": [], "source": "leave_policy.md"}
 {"q": "Do part-time employees accrue PTO at the same rate as full-time employees?", "must_contain": ["half"], "must_not": [], "source": "leave_policy.md"}
 {"q": "What federal law regarding leave does the company comply with?", "must_contain": ["fmla"], "must_not": [], "source": "leave_policy.md"}
-{"q": "When do health, dental, and vision benefits begin for new employees?", "must_contain": ["day 1"], "must_not": [], "source": "benefits_overview.md"}
-{"q": "What percentage does the company match for 401(k)?", "must_contain": ["4%"], "must_not": ["6%"], "source": "benefits_overview.md"}
-{"q": "How much is the monthly wellness stipend?", "must_contain": ["$50"], "must_not": ["$100"], "source": "benefits_overview.md"}
-{"q": "What is the annual learning budget for approved courses?", "must_contain": ["1,000"], "must_not": [], "source": "benefits_overview.md"}
+{"q": "When do health, dental, and vision benefits begin for new employees?", "must_contain": ["day 1"], "must_not": [], "source": ["benefits_overview.md", "health_insurance_details.md", "onboarding_policy.md"]}
+{"q": "What percentage does the company match for 401(k)?", "must_contain": ["4%"], "must_not": ["6%"], "source": ["benefits_overview.md", "retirement_401k_policy.md"]}
+{"q": "How much is the monthly wellness stipend?", "must_contain": ["$50"], "must_not": ["$100"], "source": ["benefits_overview.md", "wellness_program.md"]}
+{"q": "What is the annual learning budget for approved courses?", "must_contain": ["1,000"], "must_not": [], "source": ["benefits_overview.md", "tuition_reimbursement_policy.md"]}
 {"q": "What kinds of expenses qualify for reimbursement?", "must_contain": ["travel"], "must_not": [], "source": "reimbursement_policy.md"}
 {"q": "How many days do I have to submit expenses in the Finance tool?", "must_contain": ["30"], "must_not": [], "source": "reimbursement_policy.md"}
 {"q": "How soon is reimbursement typically issued after approval?", "must_contain": ["10 business days"], "must_not": [], "source": "reimbursement_policy.md"}
@@ -27,7 +27,7 @@
 {"q": "How often must I change my password?", "must_contain": ["90 days"], "must_not": [], "source": "password_policy.md"}
 {"q": "How many of my last passwords can I not reuse?", "must_contain": ["5"], "must_not": [], "source": "password_policy.md"}
 {"q": "What character types must a password contain?", "must_contain": ["uppercase"], "must_not": [], "source": "password_policy.md"}
-{"q": "Within how many hours must I report a lost company laptop?", "must_contain": ["24"], "must_not": [], "source": "device_policy.md"}
+{"q": "Within how many hours must I report a lost company laptop?", "must_contain": ["24"], "must_not": [], "source": ["device_policy.md", "byod_policy.md"]}
 {"q": "What should I use when working offsite on my company laptop?", "must_contain": ["vpn"], "must_not": [], "source": "device_policy.md"}
 {"q": "How do I reset a forgotten VPN password?", "must_contain": ["forgot password"], "must_not": [], "source": "vpn_reset.md"}
 {"q": "How long should I wait for a VPN password reset to sync?", "must_contain": ["15 minutes"], "must_not": [], "source": "vpn_reset.md"}
@@ -43,3 +43,28 @@
 {"q": "How much PTO do I get after 10 years at the company?", "must_contain": ["25"], "must_not": ["15 days"], "source": "leave_policy.md"}
 {"q": "If I've used 3 sick days to care for a family member, how many more can I use for that reason this year?", "must_contain": ["3"], "must_not": [], "source": "leave_policy.md"}
 {"q": "Do I keep my PTO accrual while on unpaid leave?", "must_contain": ["does not accrue"], "must_not": [], "source": "leave_policy.md"}
+{"q": "How many weeks of paid parental leave does a secondary caregiver get?", "must_contain": ["4"], "must_not": ["12 weeks"], "source": "parental_leave_policy.md"}
+{"q": "How many paid bereavement days do employees get for the death of an extended family member like a grandparent?", "must_contain": ["1"], "must_not": ["3 days"], "source": "bereavement_leave_policy.md"}
+{"q": "How much is the home office stipend for remote employees?", "must_contain": ["$500"], "must_not": [], "source": "remote_work_policy.md"}
+{"q": "Do I need to enroll my personal phone in MDM before checking work email on it?", "must_contain": ["mdm"], "must_not": [], "source": "byod_policy.md"}
+{"q": "After how many hours of inactivity does a VPN session time out?", "must_contain": ["8"], "must_not": [], "source": "remote_access_policy.md"}
+{"q": "What grade do I need on a degree course to get tuition reimbursed?", "must_contain": ["b"], "must_not": [], "source": "tuition_reimbursement_policy.md"}
+{"q": "What is the domestic meal per diem for business travel?", "must_contain": ["$75"], "must_not": ["$100"], "source": "travel_policy.md"}
+{"q": "How much does the company contribute to my HSA if I'm on the HDHP plan?", "must_contain": ["$500"], "must_not": [], "source": "health_insurance_details.md"}
+{"q": "How long until company 401(k) matching contributions are fully vested?", "must_contain": ["2 years"], "must_not": [], "source": "retirement_401k_policy.md"}
+{"q": "How quickly must I report a suspected data breach?", "must_contain": ["1 hour"], "must_not": ["24 hours"], "source": "data_security_policy.md"}
+{"q": "How often do I need to complete MFA on a device I've marked as remembered?", "must_contain": ["30 days"], "must_not": [], "source": "mfa_policy.md"}
+{"q": "How many free counseling sessions does the EAP offer per year?", "must_contain": ["6"], "must_not": [], "source": "wellness_program.md"}
+{"q": "How much is the one-time bike commuting reimbursement?", "must_contain": ["$150"], "must_not": [], "source": "commuter_benefits.md"}
+{"q": "What must new hires complete before their system access is activated?", "must_contain": ["mfa"], "must_not": [], "source": "onboarding_policy.md"}
+{"q": "How much notice should I give before resigning?", "must_contain": ["2 weeks"], "must_not": [], "source": "offboarding_policy.md"}
+{"q": "What gift value from a vendor must be declined or reported to my manager?", "must_contain": ["$100"], "must_not": [], "source": "code_of_conduct.md"}
+{"q": "How quickly are harassment reports typically investigated?", "must_contain": ["10 business days"], "must_not": [], "source": "anti_harassment_policy.md"}
+{"q": "How many formal performance reviews happen per year?", "must_contain": ["twice"], "must_not": [], "source": "performance_review_policy.md"}
+{"q": "What is the typical turnaround time for a new software installation request?", "must_contain": ["5 business days"], "must_not": [], "source": "software_installation_policy.md"}
+{"q": "How many days do I have to reconcile a corporate expense card transaction?", "must_contain": ["7"], "must_not": ["30 days"], "source": "expense_card_policy.md"}
+{"q": "How do I set up or troubleshoot my VPN access?", "must_contain": ["vpn"], "must_not": [], "source": ["vpn_reset.md", "remote_access_policy.md"]}
+{"q": "Where can I report workplace harassment?", "must_contain": ["hr"], "must_not": [], "source": ["code_of_conduct.md", "anti_harassment_policy.md"]}
+{"q": "How many days do I have to submit general (non-travel, non-tuition) expenses for reimbursement?", "must_contain": ["30"], "must_not": ["14 days", "45 days", "7 days"], "source": "reimbursement_policy.md"}
+{"q": "How many days do I have to submit travel expenses after my trip?", "must_contain": ["14"], "must_not": ["30 days", "45 days"], "source": "travel_policy.md"}
+{"q": "How many days do I have to submit a tuition reimbursement after finishing a course?", "must_contain": ["45"], "must_not": ["30 days", "14 days"], "source": "tuition_reimbursement_policy.md"}

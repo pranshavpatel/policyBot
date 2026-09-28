@@ -3,11 +3,28 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# LLM
+# LLM: "groq" (default, hosted) or "local" (any OpenAI-compatible server —
+# Ollama, vLLM, llama.cpp's server — reached via LOCAL_LLM_BASE_URL). See
+# agent/llm.py for the factory both agent/react_agent.py and
+# tools/qa_chain.py go through, so this is a single config flip, not a
+# code change, the same pattern as RETRIEVAL_MODE below.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
+
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # llama-3.1-8b-instant was retired from Groq's catalog; verified against
 # https://api.groq.com/openai/v1/models with a live key (2026-09-22).
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+
+# Local LLM (LLM_PROVIDER=local): any server exposing an OpenAI-compatible
+# /v1/chat/completions endpoint. Defaults match Ollama running locally;
+# point LOCAL_LLM_BASE_URL at a GPU workstation's reachable address (LAN
+# IP, Tailscale, SSH tunnel — this project doesn't set up that network
+# path) to run inference there instead. LOCAL_LLM_API_KEY is typically
+# unchecked by these servers but most OpenAI-compatible clients require a
+# non-empty string.
+LOCAL_LLM_BASE_URL = os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:11434/v1")
+LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3:8b")
+LOCAL_LLM_API_KEY = os.getenv("LOCAL_LLM_API_KEY", "ollama")
 
 # Embeddings
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")

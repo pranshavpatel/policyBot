@@ -5,11 +5,11 @@
 PolicyBot is an HR assistant that answers policy questions over a RAG pipeline and manages leave requests through a ReAct-style chat agent and a REST API, both behind JWT auth with role-based access control and an audit trail.
 
 - **FastAPI backend**, JWT auth + RBAC, structured JSON logging
-- **Hybrid (BM25 + dense) retrieval** over 6 HR/IT policy docs, with a lexical groundedness guardrail on generated answers
-- **ReAct-style chat agent** (Groq / Llama) that can also create/approve/reject/cancel leave requests as tool calls
+- **Hybrid (BM25 + dense) retrieval + cross-encoder reranking** over 26 HR/IT policy docs, with a lexical groundedness guardrail on generated answers
+- **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM), that can also create/approve/reject/cancel leave requests as tool calls
 - **React + Tailwind frontend** for the chat UI
 - **Slack integration** via the Events API
-- **45-test pytest suite + GitHub Actions CI**
+- **72-test pytest suite + GitHub Actions CI**
 
 ---
 
@@ -109,29 +109,24 @@ python -m scripts.ingest_langchain
 python -m scripts.eval_retrieval eval/qa.jsonl --k 1 --k 3 --k 5 --rerank --show-misses
 ```
 
-Measured on this repo's actual corpus (6 docs / 21 chunks, 42 source-labeled questions in `eval/qa.jsonl`):
+Measured on this repo's actual corpus — **26 policy docs / 144 chunks**, **67 source-labeled questions** in `eval/qa.jsonl` (grown from an initial 6-doc/21-chunk corpus specifically because that smaller one was too clean to be a real test: every topic mapped ~1:1 to a single document, so dense, hybrid, and reranking all scored a perfect MRR=1.0 and told us nothing about which retrieval strategy was actually better. The corpus now has deliberate overlap — multiple documents that legitimately answer the same question, e.g. Leave Policy's parental-leave summary vs. the dedicated Parental Leave Policy, both labeled as correct in `eval/qa.jsonl`'s `source` field, which now accepts a list for exactly this case):
 
 | Mode | MRR | Recall@1 | Precision@1 | Recall@3 | Precision@3 | Recall@5 | Precision@5 |
 |---|---|---|---|---|---|---|---|
-| Dense | 1.0 | 100% | 100% | 100% | 33.3% | 100% | 20.0% |
-| Hybrid | 1.0 | 100% | 100% | 100% | 33.3% | 100% | 20.0% |
+| Dense | 0.953 | 91.0% | 91.0% | 100% | 33.3% | 100% | 20.0% |
+| Hybrid | 0.950 | 91.0% | 91.0% | 100% | 33.3% | 100% | 20.0% |
+| Dense + rerank | 0.958 | 92.5% | 92.5% | 100% | 33.3% | 100% | 20.0% |
+| Hybrid + rerank | 0.958 | 92.5% | 92.5% | 100% | 33.3% | 100% | 20.0% |
 
-**Honest reading:** MRR=1.0 for both means the correct doc isn't just *somewhere* in the top-k, it's ranked #1 every single time — this corpus doesn't discriminate the two retrievers even on ranking quality, not just presence. That's an expected result of a 21-chunk corpus where each policy topic maps almost 1:1 to a single source document, not a null finding for hybrid: the value of lexical (BM25) retrieval shows up on **exact-term queries** — bare acronyms, policy numbers, IDs — where embedding similarity can be inconsistent even when it isn't here. `eval/qa.jsonl` includes bare acronym queries (`FMLA`, `MDM`) specifically to probe this; both retrievers currently handle them correctly on this small corpus, but hybrid is the one with a mechanism (exact lexical match) guaranteeing it rather than a happy accident of the corpus being small and clean. At a larger scale, or with more topically-overlapping documents, expect dense-only to show a real gap — and Precision@k dropping as k grows (33.3% at k=3, 20% at k=5) is the metric actually earning its keep here: it's mechanically expected with one relevant doc per query, and it's what would catch a retriever that pads out top-k with irrelevant chunks on a real, larger corpus where Recall@k alone can't see that cost.
+**This is the discriminating result the smaller corpus couldn't produce**, and it's after a real root-cause fix, not just corpus size — the numbers above already include it (see below); the first pass on this same 26-doc corpus scored dense MRR=0.932, Recall@5=98.5%, with one genuine miss at k=5 for every mode. Reranking measurably helps on top of that: MRR 0.953→0.958 (dense) and 0.950→0.958 (hybrid), Recall@1 up ~1.5 points either way. A concrete example of *why*, not just the aggregate number — asked *"How do I reset a forgotten VPN password?"*, dense retrieval ranked `remote_access_policy.md`'s one-line cross-reference (*"For a forgotten VPN password, follow the steps in VPN Reset"*) **above** `vpn_reset.md`'s actual numbered steps, because that cross-reference sentence lexically echoes the query almost word-for-word — a bi-encoder comparing independently-computed embeddings has no way to notice it's a pointer, not an answer. The cross-encoder, scoring the (query, chunk) pair jointly, correctly promotes `vpn_reset.md` to rank 1. Same fix, same reason, on *"Who do I contact if my VPN reset still isn't working?"* — both regression-tested in `tests/test_retrieval.py`.
 
-One real bug the hybrid path surfaced along the way: `BM25Retriever`'s default tokenizer is plain `str.split()` — no lowercasing, no punctuation stripping — so a query for `FMLA` never matched `(FMLA).` in the corpus. Fixed with a proper word-boundary tokenizer (`rag/hybrid_retriever.py::_tokenize`); regression-tested in `tests/test_retrieval.py`.
+Dense vs. hybrid is closer than the reranking effect and ties at Recall@1 (91.0% each) — the reranking stage is doing more work here than the first-stage retrieval choice is, which is itself a legitimate finding, not a shrug.
 
-**Reranking**, measured the same way (`--rerank`, `cross-encoder/ms-marco-MiniLM-L-6-v2`):
+**A genuine chunking bug, found and fixed, not just tuned around**: the first pass had one miss every mode shared — *"What kinds of expenses qualify for reimbursement?"* never retrieved `reimbursement_policy.md`, even after trying a wider reranking candidate pool (`RERANK_CANDIDATES` up to 30 — no change) and a larger cross-encoder (`ms-marco-MiniLM-L-12-v2` — still ranked the wrong doc first). Neither algorithmic lever helped because the actual cause was upstream, in `rag/splitter.py`: `MarkdownHeaderTextSplitter` strips a section's header line out of the chunk text into metadata by default — so `reimbursement_policy.md`'s "What qualifies" section became the chunk `"Business travel, lodging, meals, and essential supplies."`, which contains neither the word "qualify" nor "reimbursement". Competing chunks in other new docs (e.g. *"Rideshare, taxi, and rental car expenses are reimbursable with receipts"*) won on both embedding similarity and lexical overlap simply because they still said "reimbursable" and "expenses" out loud. Fixed by prepending the header path back into the text that actually gets embedded and indexed (`"Reimbursement Policy > What qualifies\n\nBusiness travel, lodging..."`), not just keeping it as metadata for citations — verified this fixes the specific case (the doc now ranks #2 instead of missing top-15 entirely) and re-ran the full eval to confirm no regression anywhere: that's the delta between the two number sets in this section. Zero misses at k=5 across all four modes after the fix, down from one.
 
-| Mode | MRR | Added latency/query (steady-state) |
-|---|---|---|
-| Dense | 1.0 | — |
-| Hybrid | 1.0 | — |
-| Dense + rerank | 1.0 | +29ms |
-| Hybrid + rerank | 1.0 | +23ms |
+One real bug the hybrid path surfaced along the way (on the original smaller corpus): `BM25Retriever`'s default tokenizer is plain `str.split()` — no lowercasing, no punctuation stripping — so a query for `FMLA` never matched `(FMLA).` in the corpus. Fixed with a proper word-boundary tokenizer (`rag/hybrid_retriever.py::_tokenize`); regression-tested in `tests/test_retrieval.py`.
 
-No accuracy change here either — same root cause as dense vs. hybrid above, this corpus is too small and too cleanly separated to need a second-stage reranker to pick the right document out of a crowded field. The real cost is real, though: reranking adds a genuine ~25-30ms/query on top of a first-stage retriever that was already under 20ms, because it's a forward pass per candidate rather than a single similarity lookup — small on 10-15 candidates, but it's the number that would matter at a larger `RERANK_CANDIDATES` or on a slower CPU. There's also a one-time ~1s model-load-and-warmup cost per process (`RerankingRetriever`'s first call downloads/loads the ~90MB cross-encoder and pays an extra slow first inference on top of that) — `scripts/eval_retrieval.py --rerank` warms the model before timing anything, the same way you'd warm it before serving real traffic, so the numbers above are steady-state, not skewed by that one-time cost.
-
-Where reranking *would* earn its keep here, even without moving the doc-level metrics above: `leave_policy.md` alone splits into 14 chunks, and Recall/Precision/MRR only check whether the right *document* was retrieved, not whether the single best-matching *chunk within* it was ranked first — a real chunk-level signal this eval set doesn't currently label (it has one relevant doc per question, not one relevant chunk). That's the honest gap: on a corpus with less topic-to-document overlap, or with chunk-level relevance labels, this comparison would likely look different, and the reranker exists in this repo now specifically so that measurement is one `--rerank` flag away instead of a rewrite.
+**Reranking latency**, measured the same way (`--rerank`, `cross-encoder/ms-marco-MiniLM-L-6-v2`, model explicitly warmed before timing — see the script's `--rerank` warmup note, since model load is a one-time ~1s cost unrelated to per-query latency): dense 15ms → dense+rerank 41ms (+26ms), hybrid 8ms → hybrid+rerank 34ms (+26ms). Real, and worth watching at a larger `RERANK_CANDIDATES` or on a slower CPU, but small next to the accuracy gain above on a 144-chunk corpus.
 
 ---
 
@@ -157,14 +152,34 @@ uvicorn api.app:app --port 8000 &
 python -m scripts.eval_via_api eval/qa.jsonl
 ```
 
-**Result on a real run (`openai/gpt-oss-20b` on Groq): 40/45 = 88.9%.**
+**Result on a real run (`openai/gpt-oss-20b` on Groq), on the original 45-question set: 40/45 = 88.9%.**
 
 Two things surfaced only by actually running this against a live model, both worth being explicit about rather than smoothing over:
 
-- **A real eval-harness bug**: the raw run scored 38/45. Two "failures" — `"By when must carried-over PTO be used?"` and the Day-1 benefits question — had visibly correct answers (`"...used by June 30..."`, `"...begin on Day 1..."`) that the naive `must_contain` substring check still missed, because the model renders some numbers with a narrow no-break space (`U+202F`, e.g. `"June 30"`) instead of an ASCII space. Fixed by NFKC-normalizing both sides before comparing (`scripts/eval_via_api.py::_norm`); re-verified against the exact captured answers rather than re-spending API calls on a second full run. That's the 38→40 delta.
-- **A real hallucination**, still present: asked *"Who do I contact if my VPN reset still isn't working?"*, the agent answered *"contact the IT Help Desk... helpdesk@company.com or call extension 1234"* — a phone extension and email address invented wholesale; the actual policy (`vpn_reset.md`) says to contact `#it-support`. The likely cause: the ReAct planner sometimes emits `{"action":"final",...}` directly after a tool call instead of routing the final answer back through `tools/qa_chain.py`'s groundedness check (`agent/react_agent.py`'s `outcome: "final_no_tool"` in the logs) — so an answer can reach the user without ever passing through `rag/groundedness.py`. That's a real architectural gap, not a rare fluke, and the honest next fix (not done here — it changes agent control flow, not a config value): route every `final` action's answer through `check_groundedness()` before returning it, not just the direct `rag_answer` tool path.
+- **A real eval-harness bug**: the raw run scored 38/45. Two "failures" — `"By when must carried-over PTO be used?"` and the Day-1 benefits question — had visibly correct answers (`"...used by June 30..."`, `"...begin on Day 1..."`) that the naive `must_contain` substring check still missed, because the model renders some numbers with a narrow no-break space (`U+202F`) instead of an ASCII space between the number and its unit, e.g. between "June" and "30". Fixed by NFKC-normalizing both sides before comparing (`scripts/eval_via_api.py::_norm`); re-verified against the exact captured answers rather than re-spending API calls on a second full run. That's the 38→40 delta.
+- **A real hallucination**, found and since fixed: asked *"Who do I contact if my VPN reset still isn't working?"*, the agent answered *"contact the IT Help Desk... helpdesk@company.com or call extension 1234"* — a phone extension and email address invented wholesale; the actual policy (`vpn_reset.md`) says to contact `#it-support`. Root cause: the ReAct planner could emit `{"action":"final",...}` directly after a tool call without routing the final answer back through a groundedness check — so an answer could reach the user without ever passing through `rag/groundedness.py`. Fixed in `agent/react_agent.py::_ground_final_answer()`, which now checks every final answer (the planner's own `"final"` action *and* the post-tool-loop `synthesize()` step) against the pooled context from every `rag_answer` call made that run; re-verified live against this exact question, which now correctly cites `#it-support`.
 - **Two more "failures"** (a stock-ticker question got a fabricated `"XYZ"`; a dress-code question and a CEO-salary question were both correctly refused, just phrased differently than the exact string the harness checked for) split roughly one real miss, one strict-match harness artifact — included in the raw count above rather than argued away.
-- **Latency was high**: most answers took 15–40+ seconds. Partly this model's serving latency on Groq, partly the ReAct loop re-planning 2–3 steps per question when one `rag_answer` call would do — visible directly in the structured logs (`agent_run` `steps` field). Worth profiling before this goes anywhere near a real Slack channel.
+- **Latency was high**: most answers took 15–40+ seconds. Partly this model's serving latency on Groq, partly the ReAct loop re-planning 2–3 steps per question when one `rag_answer` call would do — visible directly in the structured logs (`agent_run` `steps` field). Not yet fixed — still the top open item.
+
+**The eval set has since grown to 70 questions** (see "Retrieval quality" above for why — the smaller corpus was too clean to stress retrieval). A full re-run against the current set wasn't completed in this session: it hit Groq's per-minute rate limit partway through, twice, which surfaced a real gap worth fixing in its own right rather than just retrying past — a Groq `429` raised from inside `run_agent()` was reaching the client as an opaque `500`, indistinguishable from an actual bug. `api/app.py` now has an explicit `groq.RateLimitError` handler returning a real `429` (with `Retry-After` when Groq provides one), and `scripts/eval_via_api.py` retries on `429` with backoff — both regression-tested (`tests/test_api.py::test_agent_rate_limit_surfaces_as_429_not_500`). The 40/45 number above is real but is the *old* question set; there isn't yet a fresh accuracy number for the current 70-question corpus, and that gap is more honest to state than to paper over with a stale headline figure.
+
+---
+
+## LLM provider: Groq or local
+
+`LLM_PROVIDER=groq|local` in `.env` picks the chat model, through a single factory (`agent/llm.py`) both `agent/react_agent.py` and `tools/qa_chain.py` go through — the same "config flip, not a code change" pattern as `RETRIEVAL_MODE`. `local` works with any OpenAI-compatible server (Ollama, vLLM, llama.cpp's server) via `LOCAL_LLM_BASE_URL`.
+
+Why this exists, not just as a hypothetical: the Groq rate limit hit above is a real, live-encountered cost of a hosted API, and a local model has none. It's also a defensible privacy story specific to this project — policy and leave-request content never has to leave your own infrastructure, which matters more for an HR bot than for most chat demos.
+
+**Verified end-to-end, not just wired up**: ran the full authenticated `/agent` pipeline — login, ReAct planning, `rag_answer` tool call, groundedness check — against a real local model (`qwen3:8b` via Ollama) instead of Groq. *"How many PTO days in Year 1?"* correctly returned *"15 days"* in 72.6s. That number is CPU inference on a laptop with no GPU, not representative of real throughput — it's here to confirm correctness, not speed. Point `LOCAL_LLM_BASE_URL` at a reachable GPU workstation (LAN IP, Tailscale, SSH tunnel — setting up that network path is outside this project's scope) to get a real performance number; `tests/test_llm.py` only checks the provider-selection logic itself (CI has no GPU or Ollama to call out to), so a fresh benchmark against real hardware is a "run it and see" away, not a code change.
+
+Setup:
+```bash
+ollama pull qwen3:8b          # or point LOCAL_LLM_MODEL at whatever you have
+ollama serve                  # if not already running
+# .env: LLM_PROVIDER=local
+uvicorn api.app:app --reload --port 8000
+```
 
 ---
 
@@ -181,7 +196,7 @@ Two things surfaced only by actually running this against a live model, both wor
 ## Testing
 
 ```bash
-pytest              # 45 tests: leave-request logic, holiday logic, authz rules,
+pytest              # 72 tests: leave-request logic, holiday logic, authz rules,
                      # groundedness, actor-scoped agent tools, full API RBAC flows,
                      # retrieval correctness (skipped if the vectorstore isn't built)
 ```

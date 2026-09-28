@@ -36,6 +36,29 @@ def _login() -> str:
     return r.json()["access_token"]
 
 
+# Retries specifically on 429 (api/app.py's GroqRateLimitError handler
+# returns this distinctly from a real 500 — see api/app.py's exception
+# handler docstring for why that distinction matters here). A real 70-
+# question eval run hit Groq's rate limit partway through and every
+# subsequent request failed until the process was restarted; this is the
+# fix, not a hypothetical.
+MAX_RETRIES = 5
+BASE_BACKOFF_SECONDS = 10
+
+
+def _post_with_retry(url, **kwargs):
+    for attempt in range(MAX_RETRIES + 1):
+        r = requests.post(url, **kwargs)
+        if r.status_code != 429:
+            return r
+        if attempt == MAX_RETRIES:
+            return r
+        wait = int(r.headers.get("Retry-After", BASE_BACKOFF_SECONDS * (2 ** attempt)))
+        print(f"   … rate limited, retrying in {wait}s (attempt {attempt + 1}/{MAX_RETRIES})")
+        time.sleep(wait)
+    return r  # unreachable, satisfies linters
+
+
 def main(path="eval/qa.jsonl", trace=False):
     token = _login()
     headers = {"Authorization": f"Bearer {token}"}
@@ -49,7 +72,7 @@ def main(path="eval/qa.jsonl", trace=False):
             q=ex["q"]; total+=1
             t0=time.time()
             try:
-                r=requests.post(f"{BASE}/agent", json={"message": q, "trace": trace}, headers=headers, timeout=60)
+                r=_post_with_retry(f"{BASE}/agent", json={"message": q, "trace": trace}, headers=headers, timeout=60)
                 r.raise_for_status()
                 ans=r.json().get("answer","")
             except Exception as e:

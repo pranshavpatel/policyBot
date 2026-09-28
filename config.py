@@ -25,6 +25,17 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 LOCAL_LLM_BASE_URL = os.getenv("LOCAL_LLM_BASE_URL", "http://localhost:11434/v1")
 LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3:8b")
 LOCAL_LLM_API_KEY = os.getenv("LOCAL_LLM_API_KEY", "ollama")
+# Bounds on a single local LLM call. Without them, one call can hang the
+# whole server: Ollama's default is unlimited generation (num_predict=-1,
+# with context shifting), and qwen3 at temperature 0 can fall into an
+# endless repetition loop — this happened on a real eval run, stuck on the
+# same question twice. The HTTP client had no timeout either, so the call
+# never returned, and every later request queued behind it in Ollama until
+# uvicorn's threadpool was exhausted and even /health stopped answering.
+# The token cap covers thinking tokens too (Ollama counts them against
+# num_predict), so leave headroom for reasoning models.
+LOCAL_LLM_MAX_TOKENS = int(os.getenv("LOCAL_LLM_MAX_TOKENS", "4096"))
+LOCAL_LLM_TIMEOUT_SECONDS = float(os.getenv("LOCAL_LLM_TIMEOUT_SECONDS", "180"))
 
 # Embeddings
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")

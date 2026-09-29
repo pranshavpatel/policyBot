@@ -49,6 +49,14 @@ CHROMA_DIR = os.getenv("CHROMA_DIR", "vectorstore/chroma_policybot")
 # Retrieval: "dense" (pure vector search) or "hybrid" (BM25 + dense, ensembled)
 RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "dense")
 
+# Agent control flow: "loop" (the original hand-rolled loop,
+# agent/react_agent.py::run_agent) or "graph" (LangGraph StateGraph,
+# agent/graph.py::run_agent_graph) — deterministic routing after a
+# successful rag_answer instead of relying on the planner prompt to decide
+# to stop, plus per-user conversation memory via a checkpointer. Default
+# stays "loop" so nothing changes for anyone not opting in.
+AGENT_ENGINE = os.getenv("AGENT_ENGINE", "loop")
+
 # Cross-encoder reranking: retrieve RERANK_CANDIDATES candidates from
 # whichever RETRIEVAL_MODE is configured, score each (query, chunk) pair
 # with a cross-encoder, and keep only the top k after reranking. Off by

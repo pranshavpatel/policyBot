@@ -4,6 +4,7 @@ import logging
 import re
 import time
 from typing import Any, Dict, List, Optional
+from config import AGENT_ENGINE
 from .llm import get_llm
 from .tools import TOOLS
 from observability import get_logger, log_event
@@ -202,7 +203,16 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
           ...
         ]
       }
+
+    config.AGENT_ENGINE=graph dispatches to agent/graph.py's LangGraph
+    implementation instead — same signature and return shape, different
+    control flow (deterministic post-tool routing instead of asking the
+    planner to decide whether to stop, plus per-user conversation memory).
     """
+    if AGENT_ENGINE == "graph":
+        from .graph import run_agent_graph
+        return run_agent_graph(user_msg, actor=actor, max_steps=max_steps)
+
     trace: List[Dict[str, Any]] = []
     last_obs: Optional[Dict[str, Any]] = None
     last_tool_name: Optional[str] = None

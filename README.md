@@ -69,6 +69,7 @@ cd frontend && npm install && npm run dev   # http://localhost:5173
 ```bash
 docker compose up --build
 ```
+The backend image bakes the vectorstore in at build time (`RUN python -m scripts.ingest_langchain` in `Dockerfile` — local embeddings, no API key needed at build time), so the container serves real answers immediately on first start, no manual ingest step. Verified end-to-end: built the image, ran it standalone, and separately ran the full `docker compose` stack (both services) — real login, a real `/agent` query through Groq, and a CORS preflight check confirming `config.CORS_ORIGINS` (not a hardcoded list) actually gates which origins the API accepts.
 
 ### 6. Slack (optional)
 Create a Slack App → Event Subscriptions → point the Request URL at `https://<your-tunnel>/slack/events`.

@@ -1,0 +1,36 @@
+# No .dockerignore existed before this — `COPY . /app` in Dockerfile would
+# have baked .env (secrets), .git history, and local runtime state straight
+# into the image if they happened to exist on the machine running `docker
+# build`. This is what actually stops that, not just tidiness.
+
+.git/
+.env
+.env.*
+!.env.example
+
+# Runtime state — the image gets its own via the Dockerfile's ingest step
+# (vectorstore) and docker-compose's volumes (db); local copies shouldn't
+# leak into the image layer.
+vectorstore/
+data/policybot.db
+*.sqlite3
+eval/results/
+
+# Frontend (only relevant to frontend/Dockerfile's build context, but
+# harmless to exclude here too)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Python / editor / OS cruft
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+.vscode/
+.idea/
+
+# Not needed inside the runtime image
+tests/
+demo/

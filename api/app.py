@@ -26,6 +26,7 @@ from db.session import Base, engine
 from db import models  # noqa: F401 (ensures models are registered before create_all)
 
 from observability import RequestLoggingMiddleware, get_logger
+from config import CORS_ORIGINS
 
 log = get_logger(__name__)
 
@@ -38,14 +39,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="PolicyBot API", lifespan=lifespan)
 
-origins = [
-    "http://localhost:5173",
-    "https://pranshavpatel.vercel.app",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

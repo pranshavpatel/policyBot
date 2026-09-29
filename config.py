@@ -74,6 +74,13 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-insecure-secret-change-me")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
 
+# CORS: comma-separated list of allowed frontend origins. Defaults cover
+# local dev; a real deployment needs its actual frontend URL added here via
+# env var, not a code change + rebuild.
+CORS_ORIGINS = [o.strip() for o in os.getenv(
+    "CORS_ORIGINS", "http://localhost:5173,https://pranshavpatel.vercel.app"
+).split(",") if o.strip()]
+
 # Groundedness guardrail: minimum fraction of numeric/date tokens in an
 # answer that must also appear in the retrieved context for the answer to
 # be trusted as-is (see rag/groundedness.py)

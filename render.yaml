@@ -1,0 +1,27 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec) — lets Render
+# auto-configure the service from this file instead of clicking through
+# manual setup. No persistent disk: the vectorstore is baked into the
+# Docker image at build time (see Dockerfile), and the SQLite leave-
+# request/audit-log data is fine as ephemeral for a portfolio demo —
+# it's recreated automatically on startup (api/app.py's lifespan hook).
+# Add a disk here (Render's paid plans only) if you want that data to
+# survive redeploys.
+services:
+  - type: web
+    name: policybot-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # secret — set manually in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Render generates and stores a real random secret
+      - key: LLM_PROVIDER
+        value: groq
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: CORS_ORIGINS
+        value: https://pranshavpatel.vercel.app

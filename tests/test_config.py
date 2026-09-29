@@ -29,3 +29,10 @@ def test_cors_origins_ignores_empty_entries(monkeypatch):
     assert config.CORS_ORIGINS == ["https://a.example.com"]
     monkeypatch.delenv("CORS_ORIGINS", raising=False)
     importlib.reload(config)
+
+
+def test_embed_threads_defaults_to_one(monkeypatch):
+    monkeypatch.delenv("EMBED_THREADS", raising=False)
+    import config
+    importlib.reload(config)
+    assert config.EMBED_THREADS == 1

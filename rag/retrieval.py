@@ -5,7 +5,12 @@ across tools/doc_search.py and tools/qa_chain.py."""
 from config import RETRIEVAL_MODE, RERANK_ENABLED, RERANK_CANDIDATES
 from rag.vectorstore import get_retriever as _get_dense_retriever
 from rag.hybrid_retriever import get_hybrid_retriever as _get_hybrid_retriever
-from rag.reranker import RerankingRetriever
+# rag.reranker is NOT imported at module level — it pulls in
+# sentence-transformers/torch (see rag/embeddings.py's docstring for why
+# that's expensive: ~600MB+ just to import). Importing it only when
+# RERANK_ENABLED is actually true means the default (reranking off)
+# config never pays that cost, which is what let this app fit inside
+# Render's free-tier 512MB after the embeddings fix.
 
 
 def get_configured_retriever(k: int = 5):
@@ -17,5 +22,6 @@ def get_configured_retriever(k: int = 5):
         base = _get_dense_retriever(k=fetch_k)
 
     if RERANK_ENABLED:
+        from rag.reranker import RerankingRetriever
         return RerankingRetriever(base, top_k=k, fetch_k=fetch_k)
     return base

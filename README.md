@@ -74,6 +74,18 @@ The backend image bakes the vectorstore in at build time (`RUN python -m scripts
 ### 6. Slack (optional)
 Create a Slack App → Event Subscriptions → point the Request URL at `https://<your-tunnel>/slack/events`.
 
+### 7. Deploy (backend on Render, frontend on Vercel)
+
+`render.yaml` is a [Render Blueprint](https://render.com/docs/blueprint-spec) — Render reads it and configures the service automatically instead of you clicking through manual setup. What it can't do unattended (an account/OAuth connection is inherently a human step):
+
+1. **Render**: sign in at [render.com](https://render.com), **New → Blueprint**, connect this GitHub repo. Render finds `render.yaml` and proposes the `policybot-api` web service. `JWT_SECRET` is auto-generated; you'll be prompted for `GROQ_API_KEY` (the one secret marked `sync: false`) — paste your real key, not the placeholder in `.env.example`.
+2. Once deployed, copy the service's `https://policybot-api-xxxx.onrender.com` URL.
+3. **Vercel**: deploy `frontend/` as a Vite app, with the build-time env var `VITE_API_BASE` set to that Render URL.
+4. Update `CORS_ORIGINS` in the Render service's env vars to your actual Vercel URL (it defaults to `https://pranshavpatel.vercel.app` in `render.yaml` — change it if yours differs), and redeploy.
+5. `curl https://<your-render-url>/health` should return `{"status":"ok"}`.
+
+Free-tier Render web services spin down after inactivity and cold-start on the next request (10-60s) — expected, not a bug, if the first request after a while feels slow. No persistent disk is configured: the vectorstore is baked into the image (survives fine — it's rebuilt from `data/policies/*.md` on every deploy), but the SQLite leave-request/audit-log data is ephemeral and resets on redeploy, which is a deliberate trade-off for a free-tier portfolio demo, not an oversight — add a Render disk (paid plans) if that data needs to persist.
+
 ---
 
 ## Auth & authorization

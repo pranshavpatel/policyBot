@@ -1,0 +1,448 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 103/103 [00:00<00:00, 2078.83it/s]
+
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 103/103 [00:00<00:00, 2043.85it/s]
+INFO:     Started server process [61664]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+{"ts": "2026-09-28T19:27:16", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "86267ef9", "method": "POST", "path": "/auth/login", "status_code": 200, "latency_ms": 281.1}
+INFO:     127.0.0.1:64540 - "POST /auth/login HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:27:29", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "cab7a1cc", "stage": "plan", "latency_ms": 10744.9, "tokens": {"prompt_tokens": 924, "completion_tokens": 171, "total_tokens": 1095}}
+{"ts": "2026-09-28T19:27:34", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "cab7a1cc", "name": "rag_answer", "latency_ms": 5716.3, "ok": true}
+{"ts": "2026-09-28T19:27:56", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "cab7a1cc", "stage": "plan", "latency_ms": 22124.7, "tokens": {"prompt_tokens": 1426, "completion_tokens": 820, "total_tokens": 2246}}
+{"ts": "2026-09-28T19:27:56", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "cab7a1cc", "actor": "alice", "steps": 2, "total_latency_ms": 38587.9, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:27:56", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "cab7a1cc", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 38590.4}
+INFO:     127.0.0.1:64546 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:28:03", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ae747761", "stage": "plan", "latency_ms": 4576.1, "tokens": {"prompt_tokens": 926, "completion_tokens": 163, "total_tokens": 1089}}
+{"ts": "2026-09-28T19:28:09", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "ae747761", "name": "rag_answer", "latency_ms": 5737.7, "ok": true}
+{"ts": "2026-09-28T19:28:13", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ae747761", "stage": "plan", "latency_ms": 4519.2, "tokens": {"prompt_tokens": 1445, "completion_tokens": 152, "total_tokens": 1597}}
+{"ts": "2026-09-28T19:28:13", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "ae747761", "actor": "alice", "steps": 2, "total_latency_ms": 14834.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:28:13", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "ae747761", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14837.1}
+INFO:     127.0.0.1:64625 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:28:20", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "695944f4", "stage": "plan", "latency_ms": 4372.4, "tokens": {"prompt_tokens": 925, "completion_tokens": 162, "total_tokens": 1087}}
+{"ts": "2026-09-28T19:28:25", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "695944f4", "name": "rag_answer", "latency_ms": 5438.6, "ok": true}
+{"ts": "2026-09-28T19:28:33", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "695944f4", "stage": "plan", "latency_ms": 7478.2, "tokens": {"prompt_tokens": 1436, "completion_tokens": 262, "total_tokens": 1698}}
+{"ts": "2026-09-28T19:28:33", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "695944f4", "actor": "alice", "steps": 2, "total_latency_ms": 17290.9, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:28:33", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "695944f4", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 17293.0}
+INFO:     127.0.0.1:64671 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:28:40", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4e04c40e", "stage": "plan", "latency_ms": 5250.0, "tokens": {"prompt_tokens": 923, "completion_tokens": 193, "total_tokens": 1116}}
+{"ts": "2026-09-28T19:28:44", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "4e04c40e", "name": "rag_answer", "latency_ms": 4433.3, "ok": true}
+{"ts": "2026-09-28T19:28:50", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4e04c40e", "stage": "plan", "latency_ms": 5948.3, "tokens": {"prompt_tokens": 1461, "completion_tokens": 202, "total_tokens": 1663}}
+{"ts": "2026-09-28T19:28:50", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "4e04c40e", "actor": "alice", "steps": 2, "total_latency_ms": 15633.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:28:50", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "4e04c40e", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15635.7}
+INFO:     127.0.0.1:64711 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:28:57", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "80cc20d2", "stage": "plan", "latency_ms": 4214.4, "tokens": {"prompt_tokens": 919, "completion_tokens": 153, "total_tokens": 1072}}
+{"ts": "2026-09-28T19:29:02", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "80cc20d2", "name": "rag_answer", "latency_ms": 5287.1, "ok": true}
+{"ts": "2026-09-28T19:29:07", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "80cc20d2", "stage": "plan", "latency_ms": 5211.6, "tokens": {"prompt_tokens": 1434, "completion_tokens": 164, "total_tokens": 1598}}
+{"ts": "2026-09-28T19:29:07", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "80cc20d2", "actor": "alice", "steps": 2, "total_latency_ms": 14714.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:29:07", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "80cc20d2", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14717.0}
+INFO:     127.0.0.1:64767 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:29:13", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "182d1ddc", "stage": "plan", "latency_ms": 3649.6, "tokens": {"prompt_tokens": 922, "completion_tokens": 132, "total_tokens": 1054}}
+{"ts": "2026-09-28T19:29:20", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "182d1ddc", "name": "rag_answer", "latency_ms": 7437.0, "ok": true}
+{"ts": "2026-09-28T19:29:28", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "182d1ddc", "stage": "plan", "latency_ms": 7688.7, "tokens": {"prompt_tokens": 1446, "completion_tokens": 264, "total_tokens": 1710}}
+{"ts": "2026-09-28T19:29:28", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "182d1ddc", "actor": "alice", "steps": 2, "total_latency_ms": 18777.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:29:28", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "182d1ddc", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18779.3}
+INFO:     127.0.0.1:58821 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:29:34", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "399e82c4", "stage": "plan", "latency_ms": 3960.2, "tokens": {"prompt_tokens": 920, "completion_tokens": 141, "total_tokens": 1061}}
+{"ts": "2026-09-28T19:29:39", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "399e82c4", "name": "rag_answer", "latency_ms": 5001.2, "ok": true}
+{"ts": "2026-09-28T19:29:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "399e82c4", "stage": "plan", "latency_ms": 6881.2, "tokens": {"prompt_tokens": 1461, "completion_tokens": 234, "total_tokens": 1695}}
+{"ts": "2026-09-28T19:29:46", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "399e82c4", "actor": "alice", "steps": 2, "total_latency_ms": 15844.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:29:46", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "399e82c4", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15846.5}
+INFO:     127.0.0.1:57631 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:29:51", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8d9f4d10", "stage": "plan", "latency_ms": 3229.5, "tokens": {"prompt_tokens": 922, "completion_tokens": 113, "total_tokens": 1035}}
+{"ts": "2026-09-28T19:29:56", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "8d9f4d10", "name": "rag_answer", "latency_ms": 5050.4, "ok": true}
+{"ts": "2026-09-28T19:30:05", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8d9f4d10", "stage": "plan", "latency_ms": 8693.2, "tokens": {"prompt_tokens": 1421, "completion_tokens": 302, "total_tokens": 1723}}
+{"ts": "2026-09-28T19:30:05", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "8d9f4d10", "actor": "alice", "steps": 2, "total_latency_ms": 16974.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:30:05", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "8d9f4d10", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16977.1}
+INFO:     127.0.0.1:57664 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:30:10", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "6d309bcf", "stage": "plan", "latency_ms": 3147.9, "tokens": {"prompt_tokens": 920, "completion_tokens": 112, "total_tokens": 1032}}
+{"ts": "2026-09-28T19:30:14", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "6d309bcf", "name": "rag_answer", "latency_ms": 4119.7, "ok": true}
+{"ts": "2026-09-28T19:30:21", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "6d309bcf", "stage": "plan", "latency_ms": 6871.3, "tokens": {"prompt_tokens": 1399, "completion_tokens": 235, "total_tokens": 1634}}
+{"ts": "2026-09-28T19:30:21", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "6d309bcf", "actor": "alice", "steps": 2, "total_latency_ms": 14140.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:30:21", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "6d309bcf", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14142.6}
+INFO:     127.0.0.1:57706 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:30:27", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3e389453", "stage": "plan", "latency_ms": 4098.9, "tokens": {"prompt_tokens": 921, "completion_tokens": 147, "total_tokens": 1068}}
+{"ts": "2026-09-28T19:33:27", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3e389453", "name": "rag_answer", "latency_ms": 180016.7, "ok": false}
+{"ts": "2026-09-28T19:33:33", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3e389453", "stage": "plan", "latency_ms": 5959.6, "tokens": {"prompt_tokens": 934, "completion_tokens": 137, "total_tokens": 1071}}
+{"ts": "2026-09-28T19:36:33", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3e389453", "name": "rag_answer", "latency_ms": 180019.1, "ok": false}
+{"ts": "2026-09-28T19:36:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f670f885", "stage": "plan", "latency_ms": 72977.0, "tokens": {"prompt_tokens": 921, "completion_tokens": 174, "total_tokens": 1095}}
+{"ts": "2026-09-28T19:36:43", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3e389453", "stage": "plan", "latency_ms": 9519.1, "tokens": {"prompt_tokens": 934, "completion_tokens": 166, "total_tokens": 1100}}
+{"ts": "2026-09-28T19:37:10", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "f670f885", "name": "rag_answer", "latency_ms": 32264.7, "ok": true}
+{"ts": "2026-09-28T19:37:38", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3e389453", "name": "rag_answer", "latency_ms": 55313.7, "ok": true}
+{"ts": "2026-09-28T19:37:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f670f885", "stage": "plan", "latency_ms": 35660.1, "tokens": {"prompt_tokens": 1374, "completion_tokens": 266, "total_tokens": 1640}}
+{"ts": "2026-09-28T19:37:46", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "f670f885", "actor": "alice", "steps": 2, "total_latency_ms": 140903.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:37:46", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "f670f885", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 140907.2}
+INFO:     127.0.0.1:58195 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:37:54", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3e389453", "stage": "synthesize", "latency_ms": 15863.0, "tokens": {"prompt_tokens": 607, "completion_tokens": 270, "total_tokens": 877}}
+{"ts": "2026-09-28T19:37:54", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "3e389453", "actor": "alice", "steps": 3, "total_latency_ms": 434930.5, "outcome": "synthesized"}
+{"ts": "2026-09-28T19:37:54", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "3e389453", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 450796.3}
+{"ts": "2026-09-28T19:37:58", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "7f0c95d0", "stage": "plan", "latency_ms": 9842.7, "tokens": {"prompt_tokens": 921, "completion_tokens": 143, "total_tokens": 1064}}
+{"ts": "2026-09-28T19:38:06", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "7f0c95d0", "name": "rag_answer", "latency_ms": 8407.4, "ok": true}
+{"ts": "2026-09-28T19:38:12", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "7f0c95d0", "stage": "plan", "latency_ms": 5961.6, "tokens": {"prompt_tokens": 1361, "completion_tokens": 203, "total_tokens": 1564}}
+{"ts": "2026-09-28T19:38:12", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "7f0c95d0", "actor": "alice", "steps": 2, "total_latency_ms": 24213.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:38:12", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "7f0c95d0", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 24215.8}
+INFO:     127.0.0.1:55147 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:38:19", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e7918753", "stage": "plan", "latency_ms": 4862.7, "tokens": {"prompt_tokens": 920, "completion_tokens": 175, "total_tokens": 1095}}
+{"ts": "2026-09-28T19:38:24", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e7918753", "name": "rag_answer", "latency_ms": 5101.2, "ok": true}
+{"ts": "2026-09-28T19:38:31", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e7918753", "stage": "plan", "latency_ms": 6284.6, "tokens": {"prompt_tokens": 1403, "completion_tokens": 214, "total_tokens": 1617}}
+{"ts": "2026-09-28T19:38:31", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e7918753", "actor": "alice", "steps": 2, "total_latency_ms": 16250.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:38:31", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e7918753", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16252.9}
+INFO:     127.0.0.1:55197 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:38:36", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "d95bdb9a", "stage": "plan", "latency_ms": 3211.0, "tokens": {"prompt_tokens": 924, "completion_tokens": 115, "total_tokens": 1039}}
+{"ts": "2026-09-28T19:38:41", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "d95bdb9a", "name": "rag_answer", "latency_ms": 5567.5, "ok": true}
+{"ts": "2026-09-28T19:38:48", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "d95bdb9a", "stage": "plan", "latency_ms": 6389.4, "tokens": {"prompt_tokens": 1423, "completion_tokens": 220, "total_tokens": 1643}}
+{"ts": "2026-09-28T19:38:48", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "d95bdb9a", "actor": "alice", "steps": 2, "total_latency_ms": 15169.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:38:48", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "d95bdb9a", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15172.0}
+INFO:     127.0.0.1:55236 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:38:56", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "553ad4ff", "stage": "plan", "latency_ms": 5945.6, "tokens": {"prompt_tokens": 916, "completion_tokens": 126, "total_tokens": 1042}}
+{"ts": "2026-09-28T19:39:00", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "553ad4ff", "name": "rag_answer", "latency_ms": 4219.3, "ok": true}
+{"ts": "2026-09-28T19:39:05", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "553ad4ff", "stage": "plan", "latency_ms": 4638.0, "tokens": {"prompt_tokens": 1357, "completion_tokens": 158, "total_tokens": 1515}}
+{"ts": "2026-09-28T19:39:05", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "553ad4ff", "actor": "alice", "steps": 2, "total_latency_ms": 14804.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:39:05", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "553ad4ff", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14806.9}
+INFO:     127.0.0.1:61369 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:39:11", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "bc3b38fc", "stage": "plan", "latency_ms": 4392.4, "tokens": {"prompt_tokens": 926, "completion_tokens": 159, "total_tokens": 1085}}
+{"ts": "2026-09-28T19:39:17", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "bc3b38fc", "name": "rag_answer", "latency_ms": 5437.0, "ok": true}
+{"ts": "2026-09-28T19:39:28", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "bc3b38fc", "stage": "plan", "latency_ms": 11808.4, "tokens": {"prompt_tokens": 1413, "completion_tokens": 417, "total_tokens": 1830}}
+{"ts": "2026-09-28T19:39:28", "level": "WARNING", "logger": "policybot.agent", "message": "groundedness_blocked", "request_id": "bc3b38fc", "coverage": 0.8, "unsupported_claims": ["7.5"], "had_context": true}
+{"ts": "2026-09-28T19:39:28", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "bc3b38fc", "actor": "alice", "steps": 2, "total_latency_ms": 21639.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:39:28", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "bc3b38fc", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 21641.6}
+INFO:     127.0.0.1:57122 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:39:35", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e83975a4", "stage": "plan", "latency_ms": 4602.8, "tokens": {"prompt_tokens": 920, "completion_tokens": 160, "total_tokens": 1080}}
+{"ts": "2026-09-28T19:39:40", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e83975a4", "name": "rag_answer", "latency_ms": 4846.2, "ok": true}
+{"ts": "2026-09-28T19:39:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e83975a4", "stage": "plan", "latency_ms": 5686.9, "tokens": {"prompt_tokens": 1348, "completion_tokens": 195, "total_tokens": 1543}}
+{"ts": "2026-09-28T19:39:46", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e83975a4", "actor": "alice", "steps": 2, "total_latency_ms": 15137.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:39:46", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e83975a4", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15139.7}
+INFO:     127.0.0.1:62278 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:39:54", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "cd8ec148", "stage": "plan", "latency_ms": 6088.4, "tokens": {"prompt_tokens": 923, "completion_tokens": 221, "total_tokens": 1144}}
+{"ts": "2026-09-28T19:40:01", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "cd8ec148", "name": "rag_answer", "latency_ms": 7035.2, "ok": true}
+{"ts": "2026-09-28T19:40:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "cd8ec148", "stage": "plan", "latency_ms": 5035.9, "tokens": {"prompt_tokens": 1432, "completion_tokens": 167, "total_tokens": 1599}}
+{"ts": "2026-09-28T19:40:06", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "cd8ec148", "actor": "alice", "steps": 2, "total_latency_ms": 18161.3, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:40:06", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "cd8ec148", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18163.5}
+INFO:     127.0.0.1:62315 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:40:12", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "07b2aa0e", "stage": "plan", "latency_ms": 4056.3, "tokens": {"prompt_tokens": 922, "completion_tokens": 146, "total_tokens": 1068}}
+{"ts": "2026-09-28T19:40:17", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "07b2aa0e", "name": "rag_answer", "latency_ms": 5529.8, "ok": true}
+{"ts": "2026-09-28T19:40:24", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "07b2aa0e", "stage": "plan", "latency_ms": 6709.3, "tokens": {"prompt_tokens": 1338, "completion_tokens": 232, "total_tokens": 1570}}
+{"ts": "2026-09-28T19:40:24", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "07b2aa0e", "actor": "alice", "steps": 2, "total_latency_ms": 16297.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:40:24", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "07b2aa0e", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16299.4}
+INFO:     127.0.0.1:62356 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:40:29", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e9b016d0", "stage": "plan", "latency_ms": 2717.1, "tokens": {"prompt_tokens": 918, "completion_tokens": 95, "total_tokens": 1013}}
+{"ts": "2026-09-28T19:40:34", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e9b016d0", "name": "rag_answer", "latency_ms": 5276.2, "ok": true}
+{"ts": "2026-09-28T19:40:45", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e9b016d0", "stage": "plan", "latency_ms": 11201.3, "tokens": {"prompt_tokens": 1292, "completion_tokens": 395, "total_tokens": 1687}}
+{"ts": "2026-09-28T19:40:45", "level": "WARNING", "logger": "policybot.agent", "message": "groundedness_blocked", "request_id": "e9b016d0", "coverage": 0.75, "unsupported_claims": ["2"], "had_context": true}
+{"ts": "2026-09-28T19:40:45", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e9b016d0", "actor": "alice", "steps": 2, "total_latency_ms": 19196.5, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:40:45", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e9b016d0", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19198.7}
+INFO:     127.0.0.1:62397 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:40:51", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8e58c6ee", "stage": "plan", "latency_ms": 3716.4, "tokens": {"prompt_tokens": 919, "completion_tokens": 133, "total_tokens": 1052}}
+{"ts": "2026-09-28T19:41:01", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "8e58c6ee", "name": "rag_answer", "latency_ms": 9679.5, "ok": true}
+{"ts": "2026-09-28T19:41:11", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8e58c6ee", "stage": "plan", "latency_ms": 9854.0, "tokens": {"prompt_tokens": 1345, "completion_tokens": 343, "total_tokens": 1688}}
+{"ts": "2026-09-28T19:41:11", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "8e58c6ee", "actor": "alice", "steps": 2, "total_latency_ms": 23251.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:41:11", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "8e58c6ee", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 23253.5}
+INFO:     127.0.0.1:62440 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:41:17", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "a3bc5893", "stage": "plan", "latency_ms": 4126.0, "tokens": {"prompt_tokens": 917, "completion_tokens": 147, "total_tokens": 1064}}
+{"ts": "2026-09-28T19:41:24", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "a3bc5893", "name": "rag_answer", "latency_ms": 7220.4, "ok": true}
+{"ts": "2026-09-28T19:41:33", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "a3bc5893", "stage": "plan", "latency_ms": 8787.3, "tokens": {"prompt_tokens": 1247, "completion_tokens": 306, "total_tokens": 1553}}
+{"ts": "2026-09-28T19:41:33", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "a3bc5893", "actor": "alice", "steps": 2, "total_latency_ms": 20135.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:41:33", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "a3bc5893", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 20137.5}
+INFO:     127.0.0.1:63414 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:41:42", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "954e6f1a", "stage": "plan", "latency_ms": 7000.9, "tokens": {"prompt_tokens": 923, "completion_tokens": 253, "total_tokens": 1176}}
+{"ts": "2026-09-28T19:41:48", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "954e6f1a", "name": "rag_answer", "latency_ms": 5951.2, "ok": true}
+{"ts": "2026-09-28T19:41:58", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "954e6f1a", "stage": "plan", "latency_ms": 10055.3, "tokens": {"prompt_tokens": 1332, "completion_tokens": 350, "total_tokens": 1682}}
+{"ts": "2026-09-28T19:41:58", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "954e6f1a", "actor": "alice", "steps": 2, "total_latency_ms": 23009.3, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:41:58", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "954e6f1a", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 23011.2}
+INFO:     127.0.0.1:59806 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:42:08", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "09f4905d", "stage": "plan", "latency_ms": 7529.4, "tokens": {"prompt_tokens": 918, "completion_tokens": 176, "total_tokens": 1094}}
+{"ts": "2026-09-28T19:42:14", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "09f4905d", "name": "rag_answer", "latency_ms": 6051.5, "ok": true}
+{"ts": "2026-09-28T19:42:20", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "09f4905d", "stage": "plan", "latency_ms": 6817.2, "tokens": {"prompt_tokens": 1329, "completion_tokens": 235, "total_tokens": 1564}}
+{"ts": "2026-09-28T19:42:20", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "09f4905d", "actor": "alice", "steps": 2, "total_latency_ms": 20399.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:42:20", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "09f4905d", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 20401.8}
+INFO:     127.0.0.1:49331 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:42:26", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "7d7b5d9e", "stage": "plan", "latency_ms": 3907.7, "tokens": {"prompt_tokens": 920, "completion_tokens": 139, "total_tokens": 1059}}
+{"ts": "2026-09-28T19:42:32", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "7d7b5d9e", "name": "rag_answer", "latency_ms": 5184.9, "ok": true}
+{"ts": "2026-09-28T19:42:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "7d7b5d9e", "stage": "plan", "latency_ms": 5955.4, "tokens": {"prompt_tokens": 1262, "completion_tokens": 206, "total_tokens": 1468}}
+{"ts": "2026-09-28T19:42:38", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "7d7b5d9e", "actor": "alice", "steps": 2, "total_latency_ms": 15049.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:42:38", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "7d7b5d9e", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15051.7}
+INFO:     127.0.0.1:49379 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:42:44", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3a375230", "stage": "plan", "latency_ms": 4307.8, "tokens": {"prompt_tokens": 917, "completion_tokens": 156, "total_tokens": 1073}}
+{"ts": "2026-09-28T19:42:48", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3a375230", "name": "rag_answer", "latency_ms": 4198.0, "ok": true}
+{"ts": "2026-09-28T19:42:56", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3a375230", "stage": "plan", "latency_ms": 7512.4, "tokens": {"prompt_tokens": 1307, "completion_tokens": 261, "total_tokens": 1568}}
+{"ts": "2026-09-28T19:42:56", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "3a375230", "actor": "alice", "steps": 2, "total_latency_ms": 16020.0, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:42:56", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "3a375230", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16022.4}
+INFO:     127.0.0.1:63948 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:43:05", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "b2113ff9", "stage": "plan", "latency_ms": 7070.6, "tokens": {"prompt_tokens": 917, "completion_tokens": 257, "total_tokens": 1174}}
+{"ts": "2026-09-28T19:43:09", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "b2113ff9", "name": "rag_answer", "latency_ms": 4601.4, "ok": true}
+{"ts": "2026-09-28T19:43:17", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "b2113ff9", "stage": "plan", "latency_ms": 7456.7, "tokens": {"prompt_tokens": 1306, "completion_tokens": 259, "total_tokens": 1565}}
+{"ts": "2026-09-28T19:43:17", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "b2113ff9", "actor": "alice", "steps": 2, "total_latency_ms": 19130.5, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:43:17", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "b2113ff9", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19132.5}
+INFO:     127.0.0.1:63991 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:43:23", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "55e2f71b", "stage": "plan", "latency_ms": 4144.2, "tokens": {"prompt_tokens": 920, "completion_tokens": 147, "total_tokens": 1067}}
+{"ts": "2026-09-28T19:43:27", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "55e2f71b", "name": "rag_answer", "latency_ms": 4212.3, "ok": true}
+{"ts": "2026-09-28T19:43:32", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "55e2f71b", "stage": "plan", "latency_ms": 4711.8, "tokens": {"prompt_tokens": 1340, "completion_tokens": 158, "total_tokens": 1498}}
+{"ts": "2026-09-28T19:43:32", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "55e2f71b", "actor": "alice", "steps": 2, "total_latency_ms": 13070.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:43:32", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "55e2f71b", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 13072.1}
+INFO:     127.0.0.1:51845 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:43:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "6c7f7f82", "stage": "plan", "latency_ms": 3682.6, "tokens": {"prompt_tokens": 917, "completion_tokens": 131, "total_tokens": 1048}}
+{"ts": "2026-09-28T19:44:04", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "6c7f7f82", "name": "rag_answer", "latency_ms": 26389.3, "ok": true}
+{"ts": "2026-09-28T19:44:16", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "6c7f7f82", "stage": "plan", "latency_ms": 11980.4, "tokens": {"prompt_tokens": 1325, "completion_tokens": 416, "total_tokens": 1741}}
+{"ts": "2026-09-28T19:44:16", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "6c7f7f82", "actor": "alice", "steps": 2, "total_latency_ms": 42054.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:44:16", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "6c7f7f82", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 42056.4}
+INFO:     127.0.0.1:51882 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:44:23", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "30dbcce0", "stage": "plan", "latency_ms": 5037.2, "tokens": {"prompt_tokens": 921, "completion_tokens": 181, "total_tokens": 1102}}
+{"ts": "2026-09-28T19:44:30", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "30dbcce0", "name": "rag_answer", "latency_ms": 6751.1, "ok": true}
+{"ts": "2026-09-28T19:44:37", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "30dbcce0", "stage": "plan", "latency_ms": 6844.2, "tokens": {"prompt_tokens": 1355, "completion_tokens": 233, "total_tokens": 1588}}
+{"ts": "2026-09-28T19:44:37", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "30dbcce0", "actor": "alice", "steps": 2, "total_latency_ms": 18634.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:44:37", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "30dbcce0", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18636.4}
+INFO:     127.0.0.1:51971 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:44:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e3534bd5", "stage": "plan", "latency_ms": 7038.6, "tokens": {"prompt_tokens": 922, "completion_tokens": 254, "total_tokens": 1176}}
+{"ts": "2026-09-28T19:44:54", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e3534bd5", "name": "rag_answer", "latency_ms": 8021.0, "ok": true}
+{"ts": "2026-09-28T19:45:01", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e3534bd5", "stage": "plan", "latency_ms": 7631.5, "tokens": {"prompt_tokens": 1348, "completion_tokens": 262, "total_tokens": 1610}}
+{"ts": "2026-09-28T19:45:01", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e3534bd5", "actor": "alice", "steps": 2, "total_latency_ms": 22692.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:45:01", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e3534bd5", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 22694.7}
+INFO:     127.0.0.1:52011 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:45:07", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f1a35096", "stage": "plan", "latency_ms": 3854.1, "tokens": {"prompt_tokens": 918, "completion_tokens": 137, "total_tokens": 1055}}
+{"ts": "2026-09-28T19:45:13", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "f1a35096", "name": "rag_answer", "latency_ms": 6090.5, "ok": true}
+{"ts": "2026-09-28T19:45:20", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f1a35096", "stage": "plan", "latency_ms": 6375.2, "tokens": {"prompt_tokens": 1343, "completion_tokens": 217, "total_tokens": 1560}}
+{"ts": "2026-09-28T19:45:20", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "f1a35096", "actor": "alice", "steps": 2, "total_latency_ms": 16321.5, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:45:20", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "f1a35096", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16323.4}
+INFO:     127.0.0.1:52072 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:45:27", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "87ebb254", "stage": "plan", "latency_ms": 4772.0, "tokens": {"prompt_tokens": 922, "completion_tokens": 170, "total_tokens": 1092}}
+{"ts": "2026-09-28T19:45:33", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "87ebb254", "name": "rag_answer", "latency_ms": 6017.5, "ok": true}
+{"ts": "2026-09-28T19:45:39", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "87ebb254", "stage": "plan", "latency_ms": 5988.8, "tokens": {"prompt_tokens": 1327, "completion_tokens": 204, "total_tokens": 1531}}
+{"ts": "2026-09-28T19:45:39", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "87ebb254", "actor": "alice", "steps": 2, "total_latency_ms": 16780.0, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:45:39", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "87ebb254", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16781.9}
+INFO:     127.0.0.1:52109 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:45:48", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "10a4b4eb", "stage": "plan", "latency_ms": 6871.8, "tokens": {"prompt_tokens": 922, "completion_tokens": 249, "total_tokens": 1171}}
+{"ts": "2026-09-28T19:45:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "10a4b4eb", "name": "rag_answer", "latency_ms": 5043.0, "ok": true}
+{"ts": "2026-09-28T19:46:00", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "10a4b4eb", "stage": "plan", "latency_ms": 7036.0, "tokens": {"prompt_tokens": 1306, "completion_tokens": 242, "total_tokens": 1548}}
+{"ts": "2026-09-28T19:46:00", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "10a4b4eb", "actor": "alice", "steps": 2, "total_latency_ms": 18952.5, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:46:00", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "10a4b4eb", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18954.4}
+INFO:     127.0.0.1:52146 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:46:07", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "18831285", "stage": "plan", "latency_ms": 5536.6, "tokens": {"prompt_tokens": 920, "completion_tokens": 200, "total_tokens": 1120}}
+{"ts": "2026-09-28T19:46:15", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "18831285", "name": "rag_answer", "latency_ms": 7392.8, "ok": true}
+{"ts": "2026-09-28T19:46:23", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "18831285", "stage": "plan", "latency_ms": 8278.3, "tokens": {"prompt_tokens": 1300, "completion_tokens": 287, "total_tokens": 1587}}
+{"ts": "2026-09-28T19:46:23", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "18831285", "actor": "alice", "steps": 2, "total_latency_ms": 21209.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:46:23", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "18831285", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 21211.5}
+INFO:     127.0.0.1:52190 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:46:29", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "444c885f", "stage": "plan", "latency_ms": 3967.9, "tokens": {"prompt_tokens": 918, "completion_tokens": 143, "total_tokens": 1061}}
+{"ts": "2026-09-28T19:46:34", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "444c885f", "name": "rag_answer", "latency_ms": 5400.4, "ok": true}
+{"ts": "2026-09-28T19:46:40", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "444c885f", "stage": "plan", "latency_ms": 5921.1, "tokens": {"prompt_tokens": 1459, "completion_tokens": 197, "total_tokens": 1656}}
+{"ts": "2026-09-28T19:46:40", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "444c885f", "actor": "alice", "steps": 2, "total_latency_ms": 15291.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:46:40", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "444c885f", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15293.0}
+INFO:     127.0.0.1:52233 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:46:50", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "a88469fe", "stage": "plan", "latency_ms": 7286.0, "tokens": {"prompt_tokens": 922, "completion_tokens": 264, "total_tokens": 1186}}
+{"ts": "2026-09-28T19:46:55", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "a88469fe", "name": "rag_answer", "latency_ms": 5653.2, "ok": true}
+{"ts": "2026-09-28T19:47:03", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "a88469fe", "stage": "plan", "latency_ms": 7611.8, "tokens": {"prompt_tokens": 1469, "completion_tokens": 257, "total_tokens": 1726}}
+{"ts": "2026-09-28T19:47:03", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "a88469fe", "actor": "alice", "steps": 2, "total_latency_ms": 20552.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:47:03", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "a88469fe", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 20554.6}
+INFO:     127.0.0.1:52273 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:47:13", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "192f65e9", "stage": "plan", "latency_ms": 7824.3, "tokens": {"prompt_tokens": 912, "completion_tokens": 195, "total_tokens": 1107}}
+{"ts": "2026-09-28T19:47:18", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "192f65e9", "name": "rag_answer", "latency_ms": 5138.5, "ok": true}
+{"ts": "2026-09-28T19:47:33", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "192f65e9", "stage": "plan", "latency_ms": 15237.9, "tokens": {"prompt_tokens": 1307, "completion_tokens": 540, "total_tokens": 1847}}
+{"ts": "2026-09-28T19:47:33", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "192f65e9", "actor": "alice", "steps": 2, "total_latency_ms": 28202.5, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:47:33", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "192f65e9", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 28204.6}
+INFO:     127.0.0.1:52318 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:47:42", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "35965566", "stage": "plan", "latency_ms": 6489.5, "tokens": {"prompt_tokens": 912, "completion_tokens": 230, "total_tokens": 1142}}
+{"ts": "2026-09-28T19:47:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "35965566", "name": "rag_answer", "latency_ms": 11496.4, "ok": true}
+{"ts": "2026-09-28T19:47:59", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "35965566", "stage": "plan", "latency_ms": 5629.0, "tokens": {"prompt_tokens": 1357, "completion_tokens": 190, "total_tokens": 1547}}
+{"ts": "2026-09-28T19:47:59", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "35965566", "actor": "alice", "steps": 2, "total_latency_ms": 23616.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:47:59", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "35965566", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 23618.6}
+INFO:     127.0.0.1:62995 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:48:10", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "16cef37b", "stage": "plan", "latency_ms": 9604.2, "tokens": {"prompt_tokens": 918, "completion_tokens": 348, "total_tokens": 1266}}
+{"ts": "2026-09-28T19:48:16", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "16cef37b", "name": "rag_answer", "latency_ms": 5266.6, "ok": true}
+{"ts": "2026-09-28T19:48:20", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "16cef37b", "stage": "plan", "latency_ms": 4743.3, "tokens": {"prompt_tokens": 1343, "completion_tokens": 159, "total_tokens": 1502}}
+{"ts": "2026-09-28T19:48:20", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "16cef37b", "actor": "alice", "steps": 2, "total_latency_ms": 19615.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:48:20", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "16cef37b", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19617.7}
+INFO:     127.0.0.1:63051 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:48:30", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3c08605d", "stage": "plan", "latency_ms": 7587.7, "tokens": {"prompt_tokens": 916, "completion_tokens": 190, "total_tokens": 1106}}
+{"ts": "2026-09-28T19:48:36", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3c08605d", "name": "rag_answer", "latency_ms": 5953.4, "ok": true}
+{"ts": "2026-09-28T19:48:43", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3c08605d", "stage": "plan", "latency_ms": 7032.9, "tokens": {"prompt_tokens": 1313, "completion_tokens": 244, "total_tokens": 1557}}
+{"ts": "2026-09-28T19:48:43", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "3c08605d", "actor": "alice", "steps": 2, "total_latency_ms": 20575.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:48:43", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "3c08605d", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 20577.7}
+INFO:     127.0.0.1:63098 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:48:50", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4f15b832", "stage": "plan", "latency_ms": 4445.1, "tokens": {"prompt_tokens": 916, "completion_tokens": 159, "total_tokens": 1075}}
+{"ts": "2026-09-28T19:48:55", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "4f15b832", "name": "rag_answer", "latency_ms": 5292.5, "ok": true}
+{"ts": "2026-09-28T19:49:01", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4f15b832", "stage": "plan", "latency_ms": 6551.2, "tokens": {"prompt_tokens": 1301, "completion_tokens": 226, "total_tokens": 1527}}
+{"ts": "2026-09-28T19:49:01", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "4f15b832", "actor": "alice", "steps": 2, "total_latency_ms": 16290.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:49:01", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "4f15b832", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16292.7}
+INFO:     127.0.0.1:60923 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:49:10", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "bac3945c", "stage": "plan", "latency_ms": 6161.4, "tokens": {"prompt_tokens": 925, "completion_tokens": 224, "total_tokens": 1149}}
+{"ts": "2026-09-28T19:49:16", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "bac3945c", "name": "rag_answer", "latency_ms": 6722.4, "ok": true}
+{"ts": "2026-09-28T19:49:23", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "bac3945c", "stage": "plan", "latency_ms": 6485.6, "tokens": {"prompt_tokens": 1452, "completion_tokens": 218, "total_tokens": 1670}}
+{"ts": "2026-09-28T19:49:23", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "bac3945c", "actor": "alice", "steps": 2, "total_latency_ms": 19371.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:49:23", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "bac3945c", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19373.5}
+INFO:     127.0.0.1:55613 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:49:30", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ee0be4b9", "stage": "plan", "latency_ms": 4841.9, "tokens": {"prompt_tokens": 936, "completion_tokens": 175, "total_tokens": 1111}}
+{"ts": "2026-09-28T19:49:35", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "ee0be4b9", "name": "rag_answer", "latency_ms": 4884.0, "ok": true}
+{"ts": "2026-09-28T19:49:41", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ee0be4b9", "stage": "plan", "latency_ms": 6159.0, "tokens": {"prompt_tokens": 1417, "completion_tokens": 209, "total_tokens": 1626}}
+{"ts": "2026-09-28T19:49:41", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "ee0be4b9", "actor": "alice", "steps": 2, "total_latency_ms": 15886.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:49:41", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "ee0be4b9", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15888.7}
+INFO:     127.0.0.1:54029 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:49:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "dbe75367", "stage": "plan", "latency_ms": 3359.0, "tokens": {"prompt_tokens": 922, "completion_tokens": 120, "total_tokens": 1042}}
+{"ts": "2026-09-28T19:49:51", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "dbe75367", "name": "rag_answer", "latency_ms": 4597.2, "ok": true}
+{"ts": "2026-09-28T19:50:00", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "dbe75367", "stage": "plan", "latency_ms": 9078.0, "tokens": {"prompt_tokens": 1381, "completion_tokens": 314, "total_tokens": 1695}}
+{"ts": "2026-09-28T19:50:00", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "dbe75367", "actor": "alice", "steps": 2, "total_latency_ms": 17036.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:50:00", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "dbe75367", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 17038.2}
+INFO:     127.0.0.1:54067 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:50:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e2f49289", "stage": "plan", "latency_ms": 4144.3, "tokens": {"prompt_tokens": 922, "completion_tokens": 147, "total_tokens": 1069}}
+{"ts": "2026-09-28T19:50:12", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e2f49289", "name": "rag_answer", "latency_ms": 6272.5, "ok": true}
+{"ts": "2026-09-28T19:50:18", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e2f49289", "stage": "plan", "latency_ms": 6124.2, "tokens": {"prompt_tokens": 1395, "completion_tokens": 208, "total_tokens": 1603}}
+{"ts": "2026-09-28T19:50:18", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e2f49289", "actor": "alice", "steps": 2, "total_latency_ms": 16542.9, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:50:18", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e2f49289", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16544.8}
+INFO:     127.0.0.1:54106 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:50:26", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "24d11ae8", "stage": "plan", "latency_ms": 5823.6, "tokens": {"prompt_tokens": 932, "completion_tokens": 209, "total_tokens": 1141}}
+{"ts": "2026-09-28T19:50:31", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "24d11ae8", "name": "rag_answer", "latency_ms": 5113.0, "ok": true}
+{"ts": "2026-09-28T19:50:37", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "24d11ae8", "stage": "plan", "latency_ms": 5942.1, "tokens": {"prompt_tokens": 1360, "completion_tokens": 202, "total_tokens": 1562}}
+{"ts": "2026-09-28T19:50:37", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "24d11ae8", "actor": "alice", "steps": 2, "total_latency_ms": 16880.3, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:50:37", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "24d11ae8", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16882.0}
+INFO:     127.0.0.1:54148 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:50:44", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "308cb573", "stage": "plan", "latency_ms": 4723.0, "tokens": {"prompt_tokens": 921, "completion_tokens": 171, "total_tokens": 1092}}
+{"ts": "2026-09-28T19:50:50", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "308cb573", "name": "rag_answer", "latency_ms": 5525.2, "ok": true}
+{"ts": "2026-09-28T19:50:55", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "308cb573", "stage": "plan", "latency_ms": 4855.4, "tokens": {"prompt_tokens": 1358, "completion_tokens": 163, "total_tokens": 1521}}
+{"ts": "2026-09-28T19:50:55", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "308cb573", "actor": "alice", "steps": 2, "total_latency_ms": 15105.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:50:55", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "308cb573", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15107.4}
+INFO:     127.0.0.1:54187 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:51:02", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e7b73510", "stage": "plan", "latency_ms": 5457.5, "tokens": {"prompt_tokens": 927, "completion_tokens": 197, "total_tokens": 1124}}
+{"ts": "2026-09-28T19:51:08", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e7b73510", "name": "rag_answer", "latency_ms": 5406.7, "ok": true}
+{"ts": "2026-09-28T19:52:27", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e7b73510", "stage": "plan", "latency_ms": 79002.3, "tokens": {"prompt_tokens": 1358, "completion_tokens": 2744, "total_tokens": 4102}}
+{"ts": "2026-09-28T19:52:32", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e7b73510", "name": "rag_answer", "latency_ms": 5753.9, "ok": true}
+{"ts": "2026-09-28T19:52:41", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e7b73510", "stage": "plan", "latency_ms": 8640.5, "tokens": {"prompt_tokens": 1358, "completion_tokens": 295, "total_tokens": 1653}}
+{"ts": "2026-09-28T19:52:41", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e7b73510", "actor": "alice", "steps": 3, "total_latency_ms": 104263.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:52:41", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e7b73510", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 104265.8}
+INFO:     127.0.0.1:54228 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:52:48", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8f0a1c2c", "stage": "plan", "latency_ms": 5284.2, "tokens": {"prompt_tokens": 923, "completion_tokens": 190, "total_tokens": 1113}}
+{"ts": "2026-09-28T19:52:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "8f0a1c2c", "name": "rag_answer", "latency_ms": 4306.0, "ok": true}
+{"ts": "2026-09-28T19:52:58", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8f0a1c2c", "stage": "plan", "latency_ms": 5719.8, "tokens": {"prompt_tokens": 1390, "completion_tokens": 194, "total_tokens": 1584}}
+{"ts": "2026-09-28T19:52:58", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "8f0a1c2c", "actor": "alice", "steps": 2, "total_latency_ms": 15311.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:52:58", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "8f0a1c2c", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15313.9}
+INFO:     127.0.0.1:57370 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:53:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c323edc4", "stage": "plan", "latency_ms": 5215.8, "tokens": {"prompt_tokens": 924, "completion_tokens": 189, "total_tokens": 1113}}
+{"ts": "2026-09-28T19:53:11", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "c323edc4", "name": "rag_answer", "latency_ms": 5655.9, "ok": true}
+{"ts": "2026-09-28T19:53:19", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c323edc4", "stage": "plan", "latency_ms": 7476.8, "tokens": {"prompt_tokens": 1371, "completion_tokens": 258, "total_tokens": 1629}}
+{"ts": "2026-09-28T19:53:19", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "c323edc4", "actor": "alice", "steps": 2, "total_latency_ms": 18350.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:53:19", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "c323edc4", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18352.5}
+INFO:     127.0.0.1:57408 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:53:25", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e32e95fc", "stage": "plan", "latency_ms": 4098.5, "tokens": {"prompt_tokens": 921, "completion_tokens": 146, "total_tokens": 1067}}
+{"ts": "2026-09-28T19:53:30", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "e32e95fc", "name": "rag_answer", "latency_ms": 4952.8, "ok": true}
+{"ts": "2026-09-28T19:53:35", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "e32e95fc", "stage": "plan", "latency_ms": 5698.6, "tokens": {"prompt_tokens": 1303, "completion_tokens": 196, "total_tokens": 1499}}
+{"ts": "2026-09-28T19:53:35", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "e32e95fc", "actor": "alice", "steps": 2, "total_latency_ms": 14751.7, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:53:35", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "e32e95fc", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14753.9}
+INFO:     127.0.0.1:56020 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:53:44", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "482de115", "stage": "plan", "latency_ms": 6603.4, "tokens": {"prompt_tokens": 928, "completion_tokens": 239, "total_tokens": 1167}}
+{"ts": "2026-09-28T19:53:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "482de115", "name": "rag_answer", "latency_ms": 8776.5, "ok": true}
+{"ts": "2026-09-28T19:53:59", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "482de115", "stage": "plan", "latency_ms": 6190.1, "tokens": {"prompt_tokens": 1321, "completion_tokens": 213, "total_tokens": 1534}}
+{"ts": "2026-09-28T19:53:59", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "482de115", "actor": "alice", "steps": 2, "total_latency_ms": 21571.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:53:59", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "482de115", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 21574.0}
+INFO:     127.0.0.1:56055 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:54:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c03ed4a1", "stage": "plan", "latency_ms": 5257.8, "tokens": {"prompt_tokens": 925, "completion_tokens": 191, "total_tokens": 1116}}
+{"ts": "2026-09-28T19:54:12", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "c03ed4a1", "name": "rag_answer", "latency_ms": 5792.2, "ok": true}
+{"ts": "2026-09-28T19:54:19", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c03ed4a1", "stage": "plan", "latency_ms": 7052.5, "tokens": {"prompt_tokens": 1391, "completion_tokens": 242, "total_tokens": 1633}}
+{"ts": "2026-09-28T19:54:19", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "c03ed4a1", "actor": "alice", "steps": 2, "total_latency_ms": 18104.3, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:54:19", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "c03ed4a1", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18106.2}
+INFO:     127.0.0.1:56107 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:54:25", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "d18bbf8a", "stage": "plan", "latency_ms": 3504.4, "tokens": {"prompt_tokens": 919, "completion_tokens": 126, "total_tokens": 1045}}
+{"ts": "2026-09-28T19:54:30", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "d18bbf8a", "name": "rag_answer", "latency_ms": 4735.4, "ok": true}
+{"ts": "2026-09-28T19:54:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "d18bbf8a", "stage": "plan", "latency_ms": 8536.2, "tokens": {"prompt_tokens": 1392, "completion_tokens": 295, "total_tokens": 1687}}
+{"ts": "2026-09-28T19:54:38", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "d18bbf8a", "actor": "alice", "steps": 2, "total_latency_ms": 16778.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:54:38", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "d18bbf8a", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16779.9}
+INFO:     127.0.0.1:56156 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:54:47", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f571db6d", "stage": "plan", "latency_ms": 6725.6, "tokens": {"prompt_tokens": 927, "completion_tokens": 245, "total_tokens": 1172}}
+{"ts": "2026-09-28T19:54:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "f571db6d", "name": "rag_answer", "latency_ms": 6062.1, "ok": true}
+{"ts": "2026-09-28T19:54:59", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "f571db6d", "stage": "plan", "latency_ms": 6507.7, "tokens": {"prompt_tokens": 1395, "completion_tokens": 221, "total_tokens": 1616}}
+{"ts": "2026-09-28T19:54:59", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "f571db6d", "actor": "alice", "steps": 2, "total_latency_ms": 19297.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:54:59", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "f571db6d", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19299.7}
+INFO:     127.0.0.1:56198 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:55:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c15aa7af", "stage": "plan", "latency_ms": 4660.9, "tokens": {"prompt_tokens": 922, "completion_tokens": 168, "total_tokens": 1090}}
+{"ts": "2026-09-28T19:55:13", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "c15aa7af", "name": "rag_answer", "latency_ms": 7254.4, "ok": true}
+{"ts": "2026-09-28T19:55:19", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c15aa7af", "stage": "plan", "latency_ms": 5218.9, "tokens": {"prompt_tokens": 1311, "completion_tokens": 177, "total_tokens": 1488}}
+{"ts": "2026-09-28T19:55:19", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "c15aa7af", "actor": "alice", "steps": 2, "total_latency_ms": 17136.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:55:19", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "c15aa7af", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 17138.5}
+INFO:     127.0.0.1:56245 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:55:24", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ad48578c", "stage": "plan", "latency_ms": 3484.9, "tokens": {"prompt_tokens": 919, "completion_tokens": 125, "total_tokens": 1044}}
+{"ts": "2026-09-28T19:55:31", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "ad48578c", "name": "rag_answer", "latency_ms": 6623.0, "ok": true}
+{"ts": "2026-09-28T19:55:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ad48578c", "stage": "plan", "latency_ms": 7017.1, "tokens": {"prompt_tokens": 1350, "completion_tokens": 241, "total_tokens": 1591}}
+{"ts": "2026-09-28T19:55:38", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "ad48578c", "actor": "alice", "steps": 2, "total_latency_ms": 17126.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:55:38", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "ad48578c", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 17128.8}
+INFO:     127.0.0.1:56286 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:55:45", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8e6d41d3", "stage": "plan", "latency_ms": 5147.2, "tokens": {"prompt_tokens": 921, "completion_tokens": 185, "total_tokens": 1106}}
+{"ts": "2026-09-28T19:55:51", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "8e6d41d3", "name": "rag_answer", "latency_ms": 5617.4, "ok": true}
+{"ts": "2026-09-28T19:55:57", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8e6d41d3", "stage": "plan", "latency_ms": 6225.8, "tokens": {"prompt_tokens": 1395, "completion_tokens": 211, "total_tokens": 1606}}
+{"ts": "2026-09-28T19:55:57", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "8e6d41d3", "actor": "alice", "steps": 2, "total_latency_ms": 16992.3, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:55:57", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "8e6d41d3", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16994.5}
+INFO:     127.0.0.1:56325 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:56:02", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "07538be0", "stage": "plan", "latency_ms": 3460.3, "tokens": {"prompt_tokens": 919, "completion_tokens": 124, "total_tokens": 1043}}
+{"ts": "2026-09-28T19:56:09", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "07538be0", "name": "rag_answer", "latency_ms": 6334.2, "ok": true}
+{"ts": "2026-09-28T19:56:14", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "07538be0", "stage": "plan", "latency_ms": 4828.9, "tokens": {"prompt_tokens": 1358, "completion_tokens": 163, "total_tokens": 1521}}
+{"ts": "2026-09-28T19:56:14", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "07538be0", "actor": "alice", "steps": 2, "total_latency_ms": 14625.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:56:14", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "07538be0", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14627.1}
+INFO:     127.0.0.1:56365 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:56:20", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ab92b6ce", "stage": "plan", "latency_ms": 4799.8, "tokens": {"prompt_tokens": 924, "completion_tokens": 172, "total_tokens": 1096}}
+{"ts": "2026-09-28T19:56:25", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "ab92b6ce", "name": "rag_answer", "latency_ms": 4948.2, "ok": true}
+{"ts": "2026-09-28T19:56:33", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "ab92b6ce", "stage": "plan", "latency_ms": 7891.2, "tokens": {"prompt_tokens": 1347, "completion_tokens": 274, "total_tokens": 1621}}
+{"ts": "2026-09-28T19:56:33", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "ab92b6ce", "actor": "alice", "steps": 2, "total_latency_ms": 17641.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:56:33", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "ab92b6ce", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 17643.0}
+INFO:     127.0.0.1:56406 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:56:39", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "2bd4c6f9", "stage": "plan", "latency_ms": 3585.9, "tokens": {"prompt_tokens": 917, "completion_tokens": 129, "total_tokens": 1046}}
+{"ts": "2026-09-28T19:56:44", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "2bd4c6f9", "name": "rag_answer", "latency_ms": 5403.2, "ok": true}
+{"ts": "2026-09-28T19:56:49", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "2bd4c6f9", "stage": "plan", "latency_ms": 4837.9, "tokens": {"prompt_tokens": 1380, "completion_tokens": 161, "total_tokens": 1541}}
+{"ts": "2026-09-28T19:56:49", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "2bd4c6f9", "actor": "alice", "steps": 2, "total_latency_ms": 13828.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:56:49", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "2bd4c6f9", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 13830.7}
+INFO:     127.0.0.1:49583 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:56:55", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "959ddf45", "stage": "plan", "latency_ms": 3684.8, "tokens": {"prompt_tokens": 918, "completion_tokens": 133, "total_tokens": 1051}}
+{"ts": "2026-09-28T19:57:00", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "959ddf45", "name": "rag_answer", "latency_ms": 5067.7, "ok": true}
+{"ts": "2026-09-28T19:57:06", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "959ddf45", "stage": "plan", "latency_ms": 6214.8, "tokens": {"prompt_tokens": 1327, "completion_tokens": 213, "total_tokens": 1540}}
+{"ts": "2026-09-28T19:57:06", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "959ddf45", "actor": "alice", "steps": 2, "total_latency_ms": 14969.1, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:57:06", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "959ddf45", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 14971.0}
+INFO:     127.0.0.1:49618 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:57:12", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8117572f", "stage": "plan", "latency_ms": 4123.9, "tokens": {"prompt_tokens": 922, "completion_tokens": 149, "total_tokens": 1071}}
+{"ts": "2026-09-28T19:57:17", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "8117572f", "name": "rag_answer", "latency_ms": 4384.0, "ok": true}
+{"ts": "2026-09-28T19:57:24", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "8117572f", "stage": "plan", "latency_ms": 7527.0, "tokens": {"prompt_tokens": 1297, "completion_tokens": 263, "total_tokens": 1560}}
+{"ts": "2026-09-28T19:57:24", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "8117572f", "actor": "alice", "steps": 2, "total_latency_ms": 16036.6, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:57:24", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "8117572f", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 16038.8}
+INFO:     127.0.0.1:49659 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:57:32", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c36e4b33", "stage": "plan", "latency_ms": 5608.0, "tokens": {"prompt_tokens": 923, "completion_tokens": 204, "total_tokens": 1127}}
+{"ts": "2026-09-28T19:57:39", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "c36e4b33", "name": "rag_answer", "latency_ms": 6651.4, "ok": true}
+{"ts": "2026-09-28T19:57:45", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "c36e4b33", "stage": "plan", "latency_ms": 6489.1, "tokens": {"prompt_tokens": 1264, "completion_tokens": 224, "total_tokens": 1488}}
+{"ts": "2026-09-28T19:57:45", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "c36e4b33", "actor": "alice", "steps": 2, "total_latency_ms": 18750.2, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T19:57:45", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "c36e4b33", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 18752.1}
+INFO:     127.0.0.1:49710 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:57:51", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "68f95336", "stage": "plan", "latency_ms": 3985.1, "tokens": {"prompt_tokens": 921, "completion_tokens": 144, "total_tokens": 1065}}
+{"ts": "2026-09-28T19:58:04", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "68f95336", "name": "rag_answer", "latency_ms": 12491.8, "ok": true}
+{"ts": "2026-09-28T19:58:14", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "68f95336", "stage": "plan", "latency_ms": 10780.7, "tokens": {"prompt_tokens": 1399, "completion_tokens": 375, "total_tokens": 1774}}
+{"ts": "2026-09-28T19:58:21", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "68f95336", "name": "rag_answer", "latency_ms": 6520.0, "ok": true}
+{"ts": "2026-09-28T19:58:27", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "68f95336", "stage": "plan", "latency_ms": 6214.9, "tokens": {"prompt_tokens": 1380, "completion_tokens": 208, "total_tokens": 1588}}
+{"ts": "2026-09-28T19:58:39", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "68f95336", "name": "rag_answer", "latency_ms": 11517.3, "ok": true}
+{"ts": "2026-09-28T19:59:00", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "68f95336", "stage": "synthesize", "latency_ms": 21402.5, "tokens": {"prompt_tokens": 597, "completion_tokens": 764, "total_tokens": 1361}}
+{"ts": "2026-09-28T19:59:00", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "68f95336", "actor": "alice", "steps": 3, "total_latency_ms": 51512.7, "outcome": "synthesized"}
+{"ts": "2026-09-28T19:59:00", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "68f95336", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 72918.2}
+INFO:     127.0.0.1:49752 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T19:59:07", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "96b72eab", "stage": "plan", "latency_ms": 4616.0, "tokens": {"prompt_tokens": 916, "completion_tokens": 154, "total_tokens": 1070}}
+{"ts": "2026-09-28T19:59:13", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "96b72eab", "name": "rag_answer", "latency_ms": 6277.0, "ok": true}
+{"ts": "2026-09-28T19:59:27", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "96b72eab", "stage": "plan", "latency_ms": 13667.4, "tokens": {"prompt_tokens": 1388, "completion_tokens": 480, "total_tokens": 1868}}
+{"ts": "2026-09-28T19:59:33", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "96b72eab", "name": "rag_answer", "latency_ms": 6222.4, "ok": true}
+{"ts": "2026-09-28T19:59:46", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "96b72eab", "stage": "plan", "latency_ms": 13514.4, "tokens": {"prompt_tokens": 1388, "completion_tokens": 480, "total_tokens": 1868}}
+{"ts": "2026-09-28T19:59:53", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "96b72eab", "name": "rag_answer", "latency_ms": 6212.2, "ok": true}
+{"ts": "2026-09-28T19:59:58", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "96b72eab", "stage": "synthesize", "latency_ms": 5049.5, "tokens": {"prompt_tokens": 577, "completion_tokens": 171, "total_tokens": 748}}
+{"ts": "2026-09-28T19:59:58", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "96b72eab", "actor": "alice", "steps": 3, "total_latency_ms": 50512.4, "outcome": "synthesized"}
+{"ts": "2026-09-28T19:59:58", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "96b72eab", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 55564.6}
+INFO:     127.0.0.1:63492 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T20:00:04", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4f74afbe", "stage": "plan", "latency_ms": 4527.5, "tokens": {"prompt_tokens": 931, "completion_tokens": 153, "total_tokens": 1084}}
+{"ts": "2026-09-28T20:00:09", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "4f74afbe", "name": "rag_answer", "latency_ms": 4688.1, "ok": true}
+{"ts": "2026-09-28T20:00:15", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "4f74afbe", "stage": "plan", "latency_ms": 6144.4, "tokens": {"prompt_tokens": 1366, "completion_tokens": 211, "total_tokens": 1577}}
+{"ts": "2026-09-28T20:00:15", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "4f74afbe", "actor": "alice", "steps": 2, "total_latency_ms": 15362.0, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T20:00:15", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "4f74afbe", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 15364.1}
+INFO:     127.0.0.1:61713 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T20:00:25", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "babd673e", "stage": "plan", "latency_ms": 7574.4, "tokens": {"prompt_tokens": 923, "completion_tokens": 187, "total_tokens": 1110}}
+{"ts": "2026-09-28T20:00:30", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "babd673e", "name": "rag_answer", "latency_ms": 5028.4, "ok": true}
+{"ts": "2026-09-28T20:00:38", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "babd673e", "stage": "plan", "latency_ms": 8066.1, "tokens": {"prompt_tokens": 1347, "completion_tokens": 282, "total_tokens": 1629}}
+{"ts": "2026-09-28T20:00:38", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "babd673e", "actor": "alice", "steps": 2, "total_latency_ms": 20670.8, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T20:00:38", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "babd673e", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 20672.9}
+INFO:     127.0.0.1:61757 - "POST /agent HTTP/1.1" 200 OK
+{"ts": "2026-09-28T20:00:47", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3cba0bc8", "stage": "plan", "latency_ms": 6907.6, "tokens": {"prompt_tokens": 925, "completion_tokens": 251, "total_tokens": 1176}}
+{"ts": "2026-09-28T20:00:52", "level": "INFO", "logger": "policybot.agent", "message": "tool_call", "request_id": "3cba0bc8", "name": "rag_answer", "latency_ms": 5159.2, "ok": true}
+{"ts": "2026-09-28T20:00:59", "level": "INFO", "logger": "policybot.agent", "message": "llm_call", "request_id": "3cba0bc8", "stage": "plan", "latency_ms": 7258.6, "tokens": {"prompt_tokens": 1363, "completion_tokens": 253, "total_tokens": 1616}}
+{"ts": "2026-09-28T20:00:59", "level": "INFO", "logger": "policybot.agent", "message": "agent_run", "request_id": "3cba0bc8", "actor": "alice", "steps": 2, "total_latency_ms": 19327.4, "outcome": "final_no_tool"}
+{"ts": "2026-09-28T20:00:59", "level": "INFO", "logger": "policybot.http", "message": "request", "request_id": "3cba0bc8", "method": "POST", "path": "/agent", "status_code": 200, "latency_ms": 19329.7}
+INFO:     127.0.0.1:61797 - "POST /agent HTTP/1.1" 200 OK

@@ -1,0 +1,506 @@
+{
+  "eval_set": "eval/qa.jsonl",
+  "correct": 63,
+  "total": 70,
+  "accuracy_pct": 90.0,
+  "errors": 1,
+  "latency": {
+    "n": 69,
+    "mean_ms": 24946.9,
+    "p50_ms": 19337.2,
+    "p95_ms": 57618.5,
+    "max_ms": 142979.3
+  },
+  "rows": [
+    {
+      "q": "How many PTO days do full-time employees get in Year 1?",
+      "ok": true,
+      "error": false,
+      "ms": 40619.5,
+      "ans": "Full-time employees accrue 15 PTO days in Year 1. Source: Leave Policy — 2. PTO Accrual"
+    },
+    {
+      "q": "How many PTO days do employees get in Year 2 or Year 3?",
+      "ok": true,
+      "error": false,
+      "ms": 16878.9,
+      "ans": "Employees in Year 2 or Year 3 accrue **20 days** of PTO. \nSource: Leave Policy — 2. PTO Accrual"
+    },
+    {
+      "q": "How many PTO days do employees with 4+ years of tenure get?",
+      "ok": true,
+      "error": false,
+      "ms": 19337.2,
+      "ans": "Employees with 4+ years of tenure accrue **25 PTO days** annually.  \nSource: Leave Policy — 2. PTO Accrual."
+    },
+    {
+      "q": "How many unused PTO days can I carry over into next year?",
+      "ok": true,
+      "error": false,
+      "ms": 17680.1,
+      "ans": "You can carry over up to **5 unused PTO days** into the next calendar year. Any unused PTO beyond this limit will be forfeited. \n\nSource: Leave Policy — 3. PTO Carryover"
+    },
+    {
+      "q": "By when must carried-over PTO be used?",
+      "ok": true,
+      "error": false,
+      "ms": 16768.7,
+      "ans": "Carried-over PTO must be used by **June 30 of the following year**. \nSource: Leave Policy — 3. PTO Carryover"
+    },
+    {
+      "q": "How many calendar days in advance must a leave request be submitted?",
+      "ok": true,
+      "error": false,
+      "ms": 20834.9,
+      "ans": "All leave requests must be submitted at least **7 calendar days** in advance. This requirement is outlined in the **Leave Policy — 4. Requesting Leave** section. For parental leave specifically, a 30-day advance notice is required when the "
+    },
+    {
+      "q": "How many paid sick days do employees get per year?",
+      "ok": true,
+      "error": false,
+      "ms": 17904.4,
+      "ans": "Employees receive **10 paid sick days** annually. These days cannot be carried over from one year to the next and may be used for personal illness, injury, medical appointments, or up to 3 days per year to care for an immediate family membe"
+    },
+    {
+      "q": "After how many consecutive sick days is a doctor's note required?",
+      "ok": true,
+      "error": false,
+      "ms": 19040.5,
+      "ans": "A doctor’s note is required for absences longer than **3 consecutive sick days**.\nSource: Leave Policy — 4. Requesting Leave"
+    },
+    {
+      "q": "Can unused sick leave carry over to the next year?",
+      "ok": true,
+      "error": false,
+      "ms": 16197.1,
+      "ans": "No, sick leave cannot be carried over from one year to the next. Employees receive 10 paid sick days annually, and any unused days are forfeited at year-end. This is specified in the Leave Policy — 5. Sick Leave."
+    },
+    {
+      "q": "How many weeks of paid parental leave do eligible employees get?",
+      "ok": false,
+      "error": true,
+      "ms": 302043.4,
+      "ans": "__ERROR__ HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=300.0)"
+    },
+    {
+      "q": "How far in advance must parental leave be requested when foreseeable?",
+      "ok": true,
+      "error": false,
+      "ms": 142979.3,
+      "ans": "Parental leave must be requested at least **30 days in advance** when the birth/placement date is foreseeable. This is specified in the Parental Leave Policy (Section 3) and Leave Policy (Section 8). The request requires manager and HR appr"
+    },
+    {
+      "q": "How many paid bereavement days are employees entitled to?",
+      "ok": true,
+      "error": false,
+      "ms": 26271.6,
+      "ans": "Employees are entitled to **3 paid days** for the death of an immediate family member and **1 paid day** for the death of an extended family member. \nSource: Bereavement Leave Policy — 1. Immediate Family, 2. Extended Family"
+    },
+    {
+      "q": "How many working days of pay does jury duty provide?",
+      "ok": true,
+      "error": false,
+      "ms": 18298.8,
+      "ans": "Employees summoned for jury duty receive full pay for up to **10 working days**. Proof of jury duty summons must be submitted to HR. Source: Leave Policy — 10. Jury Duty"
+    },
+    {
+      "q": "After how many days of employment are full-time employees eligible for PTO?",
+      "ok": true,
+      "error": false,
+      "ms": 17226.5,
+      "ans": "Full-time employees are eligible for PTO after 30 days of employment. Source: Leave Policy — 1. Eligibility"
+    },
+    {
+      "q": "Are contractors eligible for PTO?",
+      "ok": true,
+      "error": false,
+      "ms": 16849.8,
+      "ans": "Contractors are not eligible for Paid Time Off (PTO). This is specified in the Leave Policy under section 1. Eligibility."
+    },
+    {
+      "q": "Do part-time employees accrue PTO at the same rate as full-time employees?",
+      "ok": false,
+      "error": false,
+      "ms": 23698.0,
+      "ans": "I found a possible answer in the policy docs but couldn't verify every number in it against the source text, so I don't want to state it with confidence. Please check the policy document directly, or rephrase your question."
+    },
+    {
+      "q": "What federal law regarding leave does the company comply with?",
+      "ok": true,
+      "error": false,
+      "ms": 17207.3,
+      "ans": "The company complies with the Family and Medical Leave Act (FMLA) and other applicable federal and state laws. For specifics, refer to the Leave Policy §13. Compliance."
+    },
+    {
+      "q": "When do health, dental, and vision benefits begin for new employees?",
+      "ok": true,
+      "error": false,
+      "ms": 20209.3,
+      "ans": "Health, dental, and vision benefits begin on **Day 1** of employment with no waiting period.  \nSource: Health Insurance Details — 1. Coverage Start"
+    },
+    {
+      "q": "What percentage does the company match for 401(k)?",
+      "ok": true,
+      "error": false,
+      "ms": 18353.9,
+      "ans": "The company matches up to 4% of employee contributions for the 401(k), dollar for dollar. This is outlined in the **401(k) Retirement Policy > 2. Company Match** section."
+    },
+    {
+      "q": "How much is the monthly wellness stipend?",
+      "ok": false,
+      "error": false,
+      "ms": 21249.7,
+      "ans": "I found a possible answer in the policy docs but couldn't verify every number in it against the source text, so I don't want to state it with confidence. Please check the policy document directly, or rephrase your question."
+    },
+    {
+      "q": "What is the annual learning budget for approved courses?",
+      "ok": true,
+      "error": false,
+      "ms": 25307.1,
+      "ans": "The annual learning budget for approved courses is $1,000 per year. This is specified in the Benefits Overview and detailed in the Tuition Reimbursement Policy, which states that up to $1,000 per year is available for tuition reimbursement,"
+    },
+    {
+      "q": "What kinds of expenses qualify for reimbursement?",
+      "ok": true,
+      "error": false,
+      "ms": 22194.0,
+      "ans": "Business travel, lodging, meals, and essential supplies qualify for reimbursement. For tuition-related expenses, courses, certifications, or degree programs must be job-related and require pre-approval from your manager. See the Reimburseme"
+    },
+    {
+      "q": "How many days do I have to submit expenses in the Finance tool?",
+      "ok": true,
+      "error": false,
+      "ms": 25066.6,
+      "ans": "You have **30 days** to submit general expenses in the Finance tool (per the Reimbursement Policy). However, specific categories have shorter windows:\n- **Travel expenses**: 14 days after trip completion (Business Travel Policy §4).\n- **Tui"
+    },
+    {
+      "q": "How soon is reimbursement typically issued after approval?",
+      "ok": true,
+      "error": false,
+      "ms": 22459.6,
+      "ans": "Reimbursement is typically issued within **10 business days** after approval, per the Reimbursement Policy. For details on submission deadlines and processes, let me know!"
+    },
+    {
+      "q": "Is manager approval required to get reimbursed for expenses?",
+      "ok": true,
+      "error": false,
+      "ms": 17101.7,
+      "ans": "Yes, manager approval is required for reimbursement per the Reimbursement Policy. This applies to standard expenses, business travel, and even tuition reimbursement (which also requires pre-approval). See Reimbursement Policy — Process, Tra"
+    },
+    {
+      "q": "What is the minimum required password length?",
+      "ok": true,
+      "error": false,
+      "ms": 18073.9,
+      "ans": "The minimum required password length is 12 characters.\n\nSource: Password Policy — Minimum length\n\nAdditional context:\n- Must include uppercase, lowercase, number, and symbol.\n- Change every 90 days.\n- Do not reuse last 5 passwords.\n- Use th"
+    },
+    {
+      "q": "How often must I change my password?",
+      "ok": true,
+      "error": false,
+      "ms": 21180.8,
+      "ans": "You must change your password every 90 days.  \nSource: Password Policy — Change every 90 days."
+    },
+    {
+      "q": "How many of my last passwords can I not reuse?",
+      "ok": true,
+      "error": false,
+      "ms": 15105.6,
+      "ans": "You cannot reuse your last 5 passwords. Source: Password Policy — Do not reuse last 5 passwords."
+    },
+    {
+      "q": "What character types must a password contain?",
+      "ok": true,
+      "error": false,
+      "ms": 44098.7,
+      "ans": "A password must contain uppercase letters, lowercase letters, numbers, and symbols. Source: Password Policy (Section: Password Policy)."
+    },
+    {
+      "q": "Within how many hours must I report a lost company laptop?",
+      "ok": true,
+      "error": false,
+      "ms": 20682.5,
+      "ans": "You must report a lost company laptop within **24 hours** to IT. This is specified in the Device Policy — 4. Loss or Theft section. For suspected data breaches or phishing attempts, reporting is required within 1 hour (per Data Security Pol"
+    },
+    {
+      "q": "What should I use when working offsite on my company laptop?",
+      "ok": true,
+      "error": false,
+      "ms": 24757.1,
+      "ans": "When working offsite on your company laptop, you must use a company-issued, MDM-managed laptop and connect via VPN for any access to internal systems or company data. Home Wi-Fi networks should use WPA2/WPA3 encryption. See Remote Work Poli"
+    },
+    {
+      "q": "How do I reset a forgotten VPN password?",
+      "ok": true,
+      "error": false,
+      "ms": 18370.8,
+      "ans": "1. Open the SSO portal and click \"Forgot Password\".  \n2. Complete MFA and reset your password.  \n3. Allow up to 15 minutes for sync; if still failing, contact IT via #it-support with your device ID.  \nSource: Remote Access Policy — 5. Troub"
+    },
+    {
+      "q": "How long should I wait for a VPN password reset to sync?",
+      "ok": true,
+      "error": false,
+      "ms": 18838.8,
+      "ans": "Allow up to 15 minutes for a VPN password reset to sync. See the Remote Access Policy (Section 5. Troubleshooting) for details."
+    },
+    {
+      "q": "Who do I contact if my VPN reset still isn't working?",
+      "ok": true,
+      "error": false,
+      "ms": 21001.3,
+      "ans": "If your VPN reset is still not working, contact IT via `#it-support` and provide your device ID. This is outlined in the Remote Access Policy under Troubleshooting (source: `remote_access_policy.md` and `vpn_reset.md`)."
+    },
+    {
+      "q": "What authentication step is required during a VPN password reset?",
+      "ok": true,
+      "error": false,
+      "ms": 23257.7,
+      "ans": "Multi-Factor Authentication (MFA) is required during a VPN password reset. The process involves:\n1. Opening the SSO portal and clicking \"Forgot Password\"\n2. Completing MFA to verify identity\n3. Resetting the password\n\nSources:\n- MFA Policy "
+    },
+    {
+      "q": "How many vacation days do interns accrue?",
+      "ok": true,
+      "error": false,
+      "ms": 17358.9,
+      "ans": "According to the Leave Policy, contractors and interns are not eligible for PTO. Source: Leave Policy — 1. Eligibility."
+    },
+    {
+      "q": "What is the company's PTO carryover deadline and limit?",
+      "ok": true,
+      "error": false,
+      "ms": 22591.6,
+      "ans": "The company allows employees to carry over up to **5 unused PTO days** into the next calendar year. Carryover PTO must be used by **June 30** of the following year. For details, refer to the Leave Policy — 3. PTO Carryover."
+    },
+    {
+      "q": "FMLA",
+      "ok": true,
+      "error": false,
+      "ms": 30255.1,
+      "ans": "The company complies with the Family and Medical Leave Act (FMLA) as outlined in applicable laws. For specific details about eligibility, duration, or procedures, please consult the Leave Policy (Section 13. Compliance) or contact HR.  \n\nSo"
+    },
+    {
+      "q": "MDM",
+      "ok": true,
+      "error": false,
+      "ms": 25663.6,
+      "ans": "Here's the information on MDM (Mobile Device Management) policies. Let me know if you need any clarification or have additional questions!"
+    },
+    {
+      "q": "What is the company's stock ticker symbol?",
+      "ok": false,
+      "error": false,
+      "ms": 21663.9,
+      "ans": "The company's stock ticker symbol is not included in the policy documents I have access to. You may need to check official financial disclosures or contact the company's investor relations department for this information."
+    },
+    {
+      "q": "What is the CEO's salary?",
+      "ok": false,
+      "error": false,
+      "ms": 22630.4,
+      "ans": "The CEO's salary is not mentioned in the provided policy documents."
+    },
+    {
+      "q": "What is the office dress code?",
+      "ok": false,
+      "error": false,
+      "ms": 18346.0,
+      "ans": "The office dress code is not explicitly specified in the provided policy documents. The available policies focus on anti-harassment, code of conduct, MFA requirements, and onboarding procedures, but none include specific guidelines about dr"
+    },
+    {
+      "q": "How much PTO do I get after 10 years at the company?",
+      "ok": true,
+      "error": false,
+      "ms": 21429.2,
+      "ans": "After 10 years at the company, you accrue **25 days** of PTO annually. \nSource: Leave Policy — 2. PTO Accrual"
+    },
+    {
+      "q": "If I've used 3 sick days to care for a family member, how many more can I use for that reason this year?",
+      "ok": true,
+      "error": false,
+      "ms": 17954.6,
+      "ans": "You have already used the maximum of **3 sick days** allowed per year for caring for an immediate family member. No additional days may be used for this reason in the current year. Source: Leave Policy — 5. Sick Leave"
+    },
+    {
+      "q": "Do I keep my PTO accrual while on unpaid leave?",
+      "ok": true,
+      "error": false,
+      "ms": 19079.6,
+      "ans": "No, PTO does not accrue during unpaid leave periods. This is specified in the Leave Policy (sections 2. PTO Accrual and 7. Unpaid Leave). For details, see the HR portal or consult the full policy documents."
+    },
+    {
+      "q": "How many weeks of paid parental leave does a secondary caregiver get?",
+      "ok": true,
+      "error": false,
+      "ms": 18584.6,
+      "ans": "A secondary caregiver is entitled to up to **4 weeks** of paid parental leave. This is specified in the Parental Leave Policy under the **2. Duration** section."
+    },
+    {
+      "q": "How many paid bereavement days do employees get for the death of an extended family member like a grandparent?",
+      "ok": true,
+      "error": false,
+      "ms": 18941.0,
+      "ans": "Employees receive **1 paid day** of bereavement leave for the death of an extended family member, including a grandparent. \nSource: Bereavement Leave Policy — 2. Extended Family"
+    },
+    {
+      "q": "How much is the home office stipend for remote employees?",
+      "ok": true,
+      "error": false,
+      "ms": 17148.4,
+      "ans": "The home office stipend for remote employees is **$500**, provided as a one-time reimbursement. Source: Remote Work Policy — 4. Home Office Stipend."
+    },
+    {
+      "q": "Do I need to enroll my personal phone in MDM before checking work email on it?",
+      "ok": true,
+      "error": false,
+      "ms": 106332.1,
+      "ans": "Yes, personal devices must be enrolled in the company's MDM profile before accessing company email or data. This requirement is outlined in the **Bring Your Own Device (BYOD) Policy** (Section 2. Enrollment Requirements) and reinforced in t"
+    },
+    {
+      "q": "After how many hours of inactivity does a VPN session time out?",
+      "ok": true,
+      "error": false,
+      "ms": 17372.5,
+      "ans": "A VPN session times out after **8 hours** of inactivity. \nSource: Remote Access Policy — 3. Session Rules"
+    },
+    {
+      "q": "What grade do I need on a degree course to get tuition reimbursed?",
+      "ok": true,
+      "error": false,
+      "ms": 20393.6,
+      "ans": "A grade of B or higher (or \"Pass\" for pass/fail courses) is required for tuition reimbursement of degree-program coursework. Certifications and workshops without letter grades are exempt. Submit within 45 days of completion with proof of gr"
+    },
+    {
+      "q": "What is the domestic meal per diem for business travel?",
+      "ok": true,
+      "error": false,
+      "ms": 16815.3,
+      "ans": "The domestic meal per diem for business travel is **$75/day**, as outlined in the Business Travel Policy (Section 2. Per Diem). This amount covers meals without requiring itemized receipts under that limit."
+    },
+    {
+      "q": "How much does the company contribute to my HSA if I'm on the HDHP plan?",
+      "ok": true,
+      "error": false,
+      "ms": 23637.2,
+      "ans": "The company contributes **$500/year** to employee HSAs for those enrolled in the HDHP plan. Source: Health Insurance Details — 4. HSA (HDHP plan only)"
+    },
+    {
+      "q": "How long until company 401(k) matching contributions are fully vested?",
+      "ok": true,
+      "error": false,
+      "ms": 20170.0,
+      "ans": "Company 401(k) matching contributions are fully vested at 2 years of service. The vesting schedule is 0% at hire, 50% at 1 year, and 100% at 2 years. Source: 401(k) Retirement Policy — 3. Vesting Schedule."
+    },
+    {
+      "q": "How quickly must I report a suspected data breach?",
+      "ok": true,
+      "error": false,
+      "ms": 18837.6,
+      "ans": "Suspected data breaches must be reported to IT Security within **1 hour** of discovery. This is specified in the Data Security Policy under section 5. Incident Reporting."
+    },
+    {
+      "q": "How often do I need to complete MFA on a device I've marked as remembered?",
+      "ok": false,
+      "error": false,
+      "ms": 21348.2,
+      "ans": "Sorry, I couldn't parse a plan. Please rephrase."
+    },
+    {
+      "q": "How many free counseling sessions does the EAP offer per year?",
+      "ok": true,
+      "error": false,
+      "ms": 19182.1,
+      "ans": "The EAP offers up to 6 free counseling sessions per year. Source: Wellness Program — 2. Mental Health Resources."
+    },
+    {
+      "q": "How much is the one-time bike commuting reimbursement?",
+      "ok": true,
+      "error": false,
+      "ms": 19184.5,
+      "ans": "The one-time bike commuting reimbursement is **$150** for employees who bike commute at least 3 days/week. \nSource: Commuter Benefits — 3. Bike Program"
+    },
+    {
+      "q": "What must new hires complete before their system access is activated?",
+      "ok": true,
+      "error": false,
+      "ms": 19039.4,
+      "ans": "New hires must complete MFA enrollment before system access is activated. This requirement is outlined in the Onboarding Policy (Section 2. Day 1)."
+    },
+    {
+      "q": "How much notice should I give before resigning?",
+      "ok": true,
+      "error": false,
+      "ms": 16679.8,
+      "ans": "Employees must provide at least 2 weeks' written notice of resignation to their manager and HR. Source: Offboarding Policy — 1. Notice"
+    },
+    {
+      "q": "What gift value from a vendor must be declined or reported to my manager?",
+      "ok": true,
+      "error": false,
+      "ms": 19709.7,
+      "ans": "Gifts from vendors or partners valued over **$100** must be declined or reported to your manager. \nSource: Code of Conduct — 4. Gifts and Business Courtesies"
+    },
+    {
+      "q": "How quickly are harassment reports typically investigated?",
+      "ok": true,
+      "error": false,
+      "ms": 15898.2,
+      "ans": "Harassment reports are typically investigated within **10 business days** of receipt. \nSource: Anti-Harassment and Anti-Discrimination Policy — 2. Reporting"
+    },
+    {
+      "q": "How many formal performance reviews happen per year?",
+      "ok": true,
+      "error": false,
+      "ms": 17025.9,
+      "ans": "Formal performance reviews occur twice a year: a mid-year check-in and a year-end review. This is specified in the Performance Review Policy (Section 1. Review Cadence). New hires also receive additional 30/60/90-day check-ins under the Onb"
+    },
+    {
+      "q": "What is the typical turnaround time for a new software installation request?",
+      "ok": true,
+      "error": false,
+      "ms": 18084.5,
+      "ans": "The typical turnaround time for a new software installation request is **5 business days**. This is outlined in the Software Installation Policy (Section 6). For details, see the [Software Installation Policy](software_installation_policy.m"
+    },
+    {
+      "q": "How many days do I have to reconcile a corporate expense card transaction?",
+      "ok": true,
+      "error": false,
+      "ms": 20792.8,
+      "ans": "You must reconcile a corporate expense card transaction within **7 days** of the transaction. \nSource: Corporate Expense Card Policy — 3. Reconciliation"
+    },
+    {
+      "q": "How do I set up or troubleshoot my VPN access?",
+      "ok": true,
+      "error": false,
+      "ms": 74972.0,
+      "ans": "VPN access is automatically provisioned for new employees/contractors on their first day. For troubleshooting, reset forgotten passwords via the SSO portal’s 'Forgot Password' (with MFA) and wait up to 15 minutes for sync; if issues persist"
+    },
+    {
+      "q": "Where can I report workplace harassment?",
+      "ok": true,
+      "error": false,
+      "ms": 57618.5,
+      "ans": "You can report workplace harassment to your manager, HR, or the anonymous ethics hotline. Reports are investigated within 10 business days (source — Anti-Harassment and Anti-Discrimination Policy, section 2. Reporting)."
+    },
+    {
+      "q": "How many days do I have to submit general (non-travel, non-tuition) expenses for reimbursement?",
+      "ok": true,
+      "error": false,
+      "ms": 17414.5,
+      "ans": "You have **30 days** to submit general (non-travel, non-tuition) expenses for reimbursement. This is specified in the Reimbursement Policy under the submission process."
+    },
+    {
+      "q": "How many days do I have to submit travel expenses after my trip?",
+      "ok": true,
+      "error": false,
+      "ms": 22707.0,
+      "ans": "You have **14 days** to submit travel expenses after your trip. \nSource: Business Travel Policy — 4. Submission Window"
+    },
+    {
+      "q": "How many days do I have to submit a tuition reimbursement after finishing a course?",
+      "ok": true,
+      "error": false,
+      "ms": 21374.7,
+      "ans": "Employees have **45 days** to submit tuition reimbursement after course completion. This is specified in the Tuition Reimbursement Policy under the Submission Process section. Unlike general expense reimbursements (which have a 30-day windo"
+    }
+  ]
+}

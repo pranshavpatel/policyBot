@@ -17,6 +17,11 @@ vectorstore/
 *.sqlite3
 data/policybot.db
 
+# Ad-hoc server logs from local runs (uvicorn stdout redirects, etc.) —
+# eval/results/ is where a deliberately-kept run's log belongs instead.
+/server.log
+/*.log
+
 # OS / editor
 .DS_Store
 .vscode/

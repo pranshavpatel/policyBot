@@ -25,10 +25,27 @@ _NUMERIC_RE = re.compile(
     re.VERBOSE,
 )
 
+# tools/qa_chain.py's SYSTEM_PROMPT asks every answer to end with
+# "Source: <source> — <section>" — and since rag/splitter.py prefixes each
+# chunk with its numbered header path (e.g. "2. Mental Health Resources"),
+# that citation line routinely contains a digit that is provenance
+# metadata, not a factual claim. Found live: a real qwen3:32b eval run had
+# a correct "$50/month" answer blocked as ungrounded because its own
+# citation cited a *different* section number ("2") than the one the
+# fact came from, and that stray digit failed the check even though the
+# actual number being asserted ("$50") was fine. Stripping the citation
+# line before extracting claims fixes that false positive without
+# weakening the check on the numbers that matter.
+_CITATION_LINE_RE = re.compile(r"(?im)^\s*source\s*:.*$")
+
+
+def _strip_citation_line(text: str) -> str:
+    return _CITATION_LINE_RE.sub("", text)
+
 
 def _extract_claims(text: str) -> List[str]:
     """Pull out numeric/date tokens an answer makes factual claims with."""
-    return [m.group(0) for m in _NUMERIC_RE.finditer(text)]
+    return [m.group(0) for m in _NUMERIC_RE.finditer(_strip_citation_line(text))]
 
 
 def _normalize(token: str) -> str:

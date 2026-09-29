@@ -39,6 +39,12 @@ LOCAL_LLM_TIMEOUT_SECONDS = float(os.getenv("LOCAL_LLM_TIMEOUT_SECONDS", "180"))
 
 # Embeddings
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+# ONNX Runtime's intra-op thread pool for the embedding model — capped low
+# by default (see rag/embeddings.py for why: it sizes to visible CPU count
+# otherwise, which cost real memory under an actual deployment's request
+# load, not just CPU scheduling). Raise it if profiling shows embedding
+# latency actually matters more than memory headroom in your deployment.
+EMBED_THREADS = int(os.getenv("EMBED_THREADS", "1"))
 
 # Database
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data/policybot.db")

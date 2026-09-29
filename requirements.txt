@@ -8,17 +8,28 @@ langchain-community>=0.3.29
 langchain_groq>=0.3.7
 langchain-openai>=0.3,<0.4  # used for LLM_PROVIDER=local (any OpenAI-compatible server); pin <0.4 — 1.x pulls langchain-core>=1.0, incompatible with langchain/langchain-groq/langchain-huggingface above
 langgraph==0.6.11  # used for AGENT_ENGINE=graph; pinned exact — langgraph>=1.0 requires langchain-core>=1.4.7, same incompatibility as above. Verified this exact version resolves cleanly against the pins here.
-langchain-huggingface>=0.3.1
 
 # Vector store / hybrid retrieval
 chromadb>=1.0.20
 langchain-chroma>=0.2.0
 rank_bm25>=0.2.2
 
-# Embeddings / models
+# Embeddings: ONNX runtime via fastembed, not sentence-transformers/torch —
+# `import sentence_transformers` alone costs ~600MB+ of process memory
+# (verified), which OOM'd this app on Render's 512MB free tier before it
+# served a single request. fastembed loads the identical model
+# (sentence-transformers/all-MiniLM-L6-v2, same 384-dim output) via ONNX
+# for ~300MB less. See rag/embeddings.py's docstring for the full story.
+fastembed>=0.8.0
+
+# sentence-transformers/transformers/torch are still needed, but ONLY for
+# the optional cross-encoder reranker (RERANK_ENABLED=true, off by
+# default — see rag/reranker.py). rag/retrieval.py imports rag.reranker
+# lazily (only when the flag is on), so these being installed doesn't cost
+# any runtime memory unless you actually enable reranking.
 sentence-transformers>=5.1.0
 transformers>=4.0
-torch          # CPU wheel available for linux/arm64 and amd64
+torch          # Docker installs the CPU wheel explicitly before this file (see Dockerfile) — otherwise resolves to a ~1.5GB+ CUDA build on Linux that a CPU-only deploy target never uses
 
 # Data & DB
 pydantic>=2.12.3

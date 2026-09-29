@@ -1,8 +1,10 @@
 # agent/react_agent.py
 import json
 import logging
+import re
 import time
 from typing import Any, Dict, List, Optional
+from config import AGENT_ENGINE
 from .llm import get_llm
 from .tools import TOOLS
 from observability import get_logger, log_event
@@ -82,6 +84,32 @@ def _token_usage(ai_message) -> Optional[Dict[str, Any]]:
     return {k: usage.get(k) for k in ("prompt_tokens", "completion_tokens", "total_tokens") if k in usage}
 
 
+_THINK_BLOCK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _extract_json_object(text: str) -> Optional[str]:
+    """Best-effort recovery when a model's output isn't strict JSON on its
+    own — found live in a qwen3:32b eval run ("Sorry, I couldn't parse a
+    plan"): some models emit a <think>...</think> reasoning block before
+    the JSON even when explicitly told to output JSON only (Qwen's
+    "thinking" mode). Strips that, then returns the first balanced {...}
+    substring, same technique as frontend/src/utils/jsonish.js uses for
+    the same underlying problem on the response-rendering side."""
+    text = _THINK_BLOCK_RE.sub("", text).strip()
+    start = text.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i + 1]
+    return None
+
+
 def plan_step(user_msg: str) -> Dict[str, Any]:
     llm = _llm()
     prompt = PLANNER_PROMPT.format(tools=_tools_description(), user_msg=user_msg)
@@ -93,7 +121,17 @@ def plan_step(user_msg: str) -> Dict[str, Any]:
     try:
         return json.loads(out)
     except Exception:
-        return {"action": "final", "answer": "Sorry, I couldn't parse a plan. Please rephrase."}
+        pass
+
+    extracted = _extract_json_object(out)
+    if extracted:
+        try:
+            return json.loads(extracted)
+        except Exception:
+            pass
+
+    log_event(log, "plan_parse_failed", level=logging.WARNING, raw_output=out[:500])
+    return {"action": "final", "answer": "Sorry, I couldn't parse a plan. Please rephrase."}
 
 
 def synthesize(user_msg: str, tool_name: str, tool_output: Dict[str, Any]) -> str:
@@ -136,8 +174,14 @@ def _ground_final_answer(answer: str, rag_context_parts: List[str]) -> str:
     result = check_groundedness(answer, context)
     if result.grounded:
         return answer
+    # blocked_answer is truncated and only logged on this rare WARNING path
+    # (not on every request) — added after a real eval run blocked two
+    # answers and left no way to tell, after the fact, whether the block
+    # was a correct catch or a false positive (one of the two turned out
+    # to be a false positive — see rag/groundedness.py's citation-line fix).
     log_event(log, "groundedness_blocked", level=logging.WARNING, coverage=result.coverage,
-              unsupported_claims=result.unsupported_claims, had_context=bool(context))
+              unsupported_claims=result.unsupported_claims, had_context=bool(context),
+              blocked_answer=answer[:300])
     return UNGROUNDED_FALLBACK
 
 
@@ -159,7 +203,16 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
           ...
         ]
       }
+
+    config.AGENT_ENGINE=graph dispatches to agent/graph.py's LangGraph
+    implementation instead — same signature and return shape, different
+    control flow (deterministic post-tool routing instead of asking the
+    planner to decide whether to stop, plus per-user conversation memory).
     """
+    if AGENT_ENGINE == "graph":
+        from .graph import run_agent_graph
+        return run_agent_graph(user_msg, actor=actor, max_steps=max_steps)
+
     trace: List[Dict[str, Any]] = []
     last_obs: Optional[Dict[str, Any]] = None
     last_tool_name: Optional[str] = None

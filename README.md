@@ -6,10 +6,10 @@ PolicyBot is an HR assistant that answers policy questions over a RAG pipeline a
 
 - **FastAPI backend**, JWT auth + RBAC, structured JSON logging
 - **Hybrid (BM25 + dense) retrieval + cross-encoder reranking** over 26 HR/IT policy docs, with a lexical groundedness guardrail on generated answers
-- **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM), that can also create/approve/reject/cancel leave requests as tool calls
+- **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM) — 90.0% end-to-end accuracy measured on real GPU hardware (`qwen3:32b`, RTX 6000 Ada) — that can also create/approve/reject/cancel leave requests as tool calls
 - **React + Tailwind frontend** for the chat UI
 - **Slack integration** via the Events API
-- **72-test pytest suite + GitHub Actions CI**
+- **90-test pytest suite + GitHub Actions CI**
 
 ---
 
@@ -159,9 +159,9 @@ Two things surfaced only by actually running this against a live model, both wor
 - **A real eval-harness bug**: the raw run scored 38/45. Two "failures" — `"By when must carried-over PTO be used?"` and the Day-1 benefits question — had visibly correct answers (`"...used by June 30..."`, `"...begin on Day 1..."`) that the naive `must_contain` substring check still missed, because the model renders some numbers with a narrow no-break space (`U+202F`) instead of an ASCII space between the number and its unit, e.g. between "June" and "30". Fixed by NFKC-normalizing both sides before comparing (`scripts/eval_via_api.py::_norm`); re-verified against the exact captured answers rather than re-spending API calls on a second full run. That's the 38→40 delta.
 - **A real hallucination**, found and since fixed: asked *"Who do I contact if my VPN reset still isn't working?"*, the agent answered *"contact the IT Help Desk... helpdesk@company.com or call extension 1234"* — a phone extension and email address invented wholesale; the actual policy (`vpn_reset.md`) says to contact `#it-support`. Root cause: the ReAct planner could emit `{"action":"final",...}` directly after a tool call without routing the final answer back through a groundedness check — so an answer could reach the user without ever passing through `rag/groundedness.py`. Fixed in `agent/react_agent.py::_ground_final_answer()`, which now checks every final answer (the planner's own `"final"` action *and* the post-tool-loop `synthesize()` step) against the pooled context from every `rag_answer` call made that run; re-verified live against this exact question, which now correctly cites `#it-support`.
 - **Two more "failures"** (a stock-ticker question got a fabricated `"XYZ"`; a dress-code question and a CEO-salary question were both correctly refused, just phrased differently than the exact string the harness checked for) split roughly one real miss, one strict-match harness artifact — included in the raw count above rather than argued away.
-- **Latency was high**: most answers took 15–40+ seconds. Partly this model's serving latency on Groq, partly the ReAct loop re-planning 2–3 steps per question when one `rag_answer` call would do — visible directly in the structured logs (`agent_run` `steps` field). Not yet fixed — still the top open item.
+- **Latency was high**: most answers took 15–40+ seconds. Partly this model's serving latency on Groq, partly the ReAct loop re-planning 2–3 steps per question when one `rag_answer` call would do — visible directly in the structured logs (`agent_run` `steps` field). Fixed for the re-planning half: see "Agent engine: hand-rolled loop or LangGraph" below (`AGENT_ENGINE=graph`), which routes deterministically instead of asking the model to decide when to stop — measured 70.2s/2 steps → 29.7s/1 step on the same question.
 
-**The eval set has since grown to 70 questions** (see "Retrieval quality" above for why — the smaller corpus was too clean to stress retrieval). A full re-run against the current set wasn't completed in this session: it hit Groq's per-minute rate limit partway through, twice, which surfaced a real gap worth fixing in its own right rather than just retrying past — a Groq `429` raised from inside `run_agent()` was reaching the client as an opaque `500`, indistinguishable from an actual bug. `api/app.py` now has an explicit `groq.RateLimitError` handler returning a real `429` (with `Retry-After` when Groq provides one), and `scripts/eval_via_api.py` retries on `429` with backoff — both regression-tested (`tests/test_api.py::test_agent_rate_limit_surfaces_as_429_not_500`). The 40/45 number above is real but is the *old* question set; there isn't yet a fresh accuracy number for the current 70-question corpus, and that gap is more honest to state than to paper over with a stale headline figure.
+**The eval set has since grown to 70 questions** (see "Retrieval quality" above for why — the smaller corpus was too clean to stress retrieval). A full re-run against the current set wasn't completed in this session: it hit Groq's per-minute rate limit partway through, twice, which surfaced a real gap worth fixing in its own right rather than just retrying past — a Groq `429` raised from inside `run_agent()` was reaching the client as an opaque `500`, indistinguishable from an actual bug. `api/app.py` now has an explicit `groq.RateLimitError` handler returning a real `429` (with `Retry-After` when Groq provides one), and `scripts/eval_via_api.py` retries on `429` with backoff — both regression-tested (`tests/test_api.py::test_agent_rate_limit_surfaces_as_429_not_500`). The 40/45 number above is real but is the *old* question set on Groq; a fresh number for the current 70-question corpus does exist now — see "LLM provider: Groq or local" below for the 63/70 = 90.0% result on `qwen3:32b`, obtained on real GPU hardware once the Groq rate limit made a same-provider re-run impractical here.
 
 ---
 
@@ -171,13 +171,55 @@ Two things surfaced only by actually running this against a live model, both wor
 
 Why this exists, not just as a hypothetical: the Groq rate limit hit above is a real, live-encountered cost of a hosted API, and a local model has none. It's also a defensible privacy story specific to this project — policy and leave-request content never has to leave your own infrastructure, which matters more for an HR bot than for most chat demos.
 
-**Verified end-to-end, not just wired up**: ran the full authenticated `/agent` pipeline — login, ReAct planning, `rag_answer` tool call, groundedness check — against a real local model (`qwen3:8b` via Ollama) instead of Groq. *"How many PTO days in Year 1?"* correctly returned *"15 days"* in 72.6s. That number is CPU inference on a laptop with no GPU, not representative of real throughput — it's here to confirm correctness, not speed. Point `LOCAL_LLM_BASE_URL` at a reachable GPU workstation (LAN IP, Tailscale, SSH tunnel — setting up that network path is outside this project's scope) to get a real performance number; `tests/test_llm.py` only checks the provider-selection logic itself (CI has no GPU or Ollama to call out to), so a fresh benchmark against real hardware is a "run it and see" away, not a code change.
+**Verified end-to-end on real GPU hardware, not just wired up.** First pass (this repo, no GPU access): ran the full authenticated `/agent` pipeline against `qwen3:8b` via Ollama on CPU — *"How many PTO days in Year 1?"* correctly returned *"15 days"* in 72.6s, confirming correctness with an explicit caveat that CPU timing wasn't representative of real throughput.
+
+**Then it actually got tested on real hardware**: a full run of all 70 questions in `eval/qa.jsonl` against `qwen3:32b` via Ollama on an **NVIDIA RTX 6000 Ada** (results in `eval/results/`) — the benchmark the CPU run above explicitly said it couldn't produce.
+
+| | Groq (`openai/gpt-oss-20b`) | Local (`qwen3:32b`, RTX 6000 Ada) |
+|---|---|---|
+| Question set | 45 (original) | 70 (current, harder) |
+| Accuracy | 40/45 = 88.9% | **63/70 = 90.0%** |
+| Latency | 15–40s+ typical | mean 24.9s, p50 19.3s, p95 57.6s, max 143.0s |
+
+Higher accuracy on a harder, larger question set — on hardware with no rate limit. Latency profile is in the same ballpark as Groq's, not obviously faster; the tail (p95/max) is worse, which matters more for the redundant-re-planning latency problem than the median does, so this isn't an unambiguous latency win, just a real, measured one instead of a hoped-for one.
+
+Two real bugs this run surfaced and got fixed, not just a clean number:
+
+- **A server hang, from before this run**: `qwen3:32b` on Ollama has no default generation limit and the OpenAI-compatible client had no timeout, so a runaway generation on one question wedged the whole server — every later request queued behind it until even `/health` stopped responding. Fixed (in a prior commit): `agent/llm.py`'s local provider now sets `max_tokens`, a request `timeout`, and `max_retries=0`.
+- **A groundedness false positive, found via this run's one non-timeout accuracy miss worth chasing**: a correct `"$50/month"` wellness-stipend answer got blocked as ungrounded. The `groundedness_blocked` log entry showed why — `unsupported_claims: ["2"]` — and `wellness_program.md` has a `## 2. Mental Health Resources` header (from the header-prefixing chunking fix earlier in this doc). The model's own citation line (`"Source: ... — 2. Mental Health Resources"`) cited a different section than the fact came from, and that stray digit failed the check even though the actual number asserted (`$50`) was fine. Fixed in `rag/groundedness.py`: the citation line is stripped before extracting numeric claims, since it's provenance metadata, not a factual assertion — regression-tested (`tests/test_groundedness.py::test_citation_line_section_number_is_not_a_claim`), with a paired test confirming a real hallucination next to a citation line is still caught.
+
+Also added along the way, from hitting an unrelated real parse failure in the same run (`"Sorry, I couldn't parse a plan"` on one question): some models — Qwen's "thinking" mode is the documented case — emit a `<think>...</think>` reasoning block before JSON even when explicitly told to output JSON only. `agent/react_agent.py::plan_step` now strips that and recovers the JSON object inside before giving up (`tests/test_plan_parsing.py`); and every genuine parse failure now logs the raw model output (truncated) instead of silently falling back, which is what made the groundedness false-positive above diagnosable at all instead of a one-off mystery.
 
 Setup:
 ```bash
 ollama pull qwen3:8b          # or point LOCAL_LLM_MODEL at whatever you have
 ollama serve                  # if not already running
 # .env: LLM_PROVIDER=local
+uvicorn api.app:app --reload --port 8000
+```
+
+---
+
+## Agent engine: hand-rolled loop or LangGraph
+
+`AGENT_ENGINE=loop|graph` in `.env` picks the control flow — the same config-flip pattern as `RETRIEVAL_MODE`/`LLM_PROVIDER`, defaulting to `loop` (the original hand-rolled implementation in `agent/react_agent.py`) so nothing changes for anyone not opting in. `graph` (`agent/graph.py`) is a small LangGraph `StateGraph` — `plan → execute_tool → finalize` — that reuses `react_agent.py`'s `plan_step`/`synthesize`/`_ground_final_answer` unchanged; only the control flow around them is different.
+
+**This is the direct fix for the redundant-re-call latency problem** (the top open item as of the last few sections above), not a rewrite for its own sake: after a successful `rag_answer` call, the graph's edge routes straight to `finalize` — a deterministic graph edge, not an LLM's free-form judgment call about whether to stop. There's no prompt wording for a model to ignore, because the model is never asked.
+
+**Verified with a real, controlled before/after** — same question, same model (`qwen3:8b` via Ollama on an M5 Air), only `AGENT_ENGINE` changed:
+
+| | Loop | Graph |
+|---|---|---|
+| *"How many PTO days in Year 1?"* | 70.2s, 2 steps | 29.7s, 1 step |
+
+The second loop step was a full LLM call whose entire job was outputting `{"action":"final","answer":"15 days"}` — pure overhead the graph's routing eliminates by construction. Not cherry-picked: a second question showed the same pattern (2 steps → 1 step).
+
+**Also adds real conversation memory**, via a checkpointer keyed by the authenticated user (`MemorySaver` — in-process, resets on restart; swapping in a persistent one, e.g. `langgraph.checkpoint.sqlite`'s `SqliteSaver`, is a small follow-up, not done here to keep this change scoped). Verified live, including a real interaction bug this surfaced and got fixed before shipping: a follow-up question answered from memory (*"Is that the same as the stipend I asked about?"*, no new `rag_answer` call that turn) initially got blocked by the groundedness guardrail — correctly, by the guardrail's own logic (`had_context: false`, so any number is unsupported by design), but unhelpfully, since the fact really was grounded, just in the *previous* turn. Fixed by carrying `rag_context_parts` forward across turns in the same thread (capped at the last 20 chunks, alongside `messages`), not just accumulating within one turn — re-verified live, same conversation, now answers correctly instead of refusing.
+
+`tests/test_agent_graph.py` covers the routing logic with mocked tools/planner (no real LLM, so this runs in CI) — including a regression test for a real bug the tests caught before it shipped: an unknown tool name was routing straight to `finalize` with no error context (a generic "I couldn't decide" instead of "Unknown tool 'x'"), fixed in `_route_after_plan`.
+
+```bash
+# .env: AGENT_ENGINE=graph
 uvicorn api.app:app --reload --port 8000
 ```
 
@@ -196,7 +238,7 @@ uvicorn api.app:app --reload --port 8000
 ## Testing
 
 ```bash
-pytest              # 72 tests: leave-request logic, holiday logic, authz rules,
+pytest              # 90 tests: leave-request logic, holiday logic, authz rules,
                      # groundedness, actor-scoped agent tools, full API RBAC flows,
                      # retrieval correctness (skipped if the vectorstore isn't built)
 ```
@@ -219,7 +261,9 @@ policyBot/
 ├── slack/        # Slack Events API integration
 ├── tools/        # doc_search, qa_chain, leave_request, holiday_check
 ├── tests/        # pytest suite
-└── eval/qa.jsonl # labeled Q&A set used by both eval scripts
+└── eval/
+    ├── qa.jsonl  # labeled Q&A set used by both eval scripts
+    └── results/  # kept eval runs (e.g. the qwen3:32b GPU benchmark)
 ```
 
 ## Example queries

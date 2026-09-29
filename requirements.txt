@@ -7,6 +7,7 @@ langchain>=0.3.27
 langchain-community>=0.3.29
 langchain_groq>=0.3.7
 langchain-openai>=0.3,<0.4  # used for LLM_PROVIDER=local (any OpenAI-compatible server); pin <0.4 — 1.x pulls langchain-core>=1.0, incompatible with langchain/langchain-groq/langchain-huggingface above
+langgraph==0.6.11  # used for AGENT_ENGINE=graph; pinned exact — langgraph>=1.0 requires langchain-core>=1.4.7, same incompatibility as above. Verified this exact version resolves cleanly against the pins here.
 langchain-huggingface>=0.3.1
 
 # Vector store / hybrid retrieval

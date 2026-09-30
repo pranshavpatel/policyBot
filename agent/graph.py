@@ -5,12 +5,17 @@ flip, not a rewrite" pattern as RETRIEVAL_MODE/LLM_PROVIDER).
 Two things this fixes that the loop couldn't, by construction rather than
 by asking the model nicely:
 
-- The redundant-re-call latency bug (README: "the ReAct loop re-planning
-  2-3 steps per question when one rag_answer call would do"). After a
-  successful rag_answer (or another direct-answer tool), the graph's edge
-  routes straight to `finalize` — a deterministic graph edge, not an
-  LLM's free-form judgment call about whether to stop. There's no prompt
-  wording for the model to ignore, because the model is never asked.
+- The redundant-re-call bug (README: "the ReAct loop re-planning 2-3
+  steps per question when one rag_answer call would do"). After ANY
+  successful tool call, the graph's edge routes straight to `finalize` —
+  a deterministic graph edge, not an LLM's free-form judgment call about
+  whether to stop. There's no prompt wording for the model to ignore,
+  because the model is never asked. This isn't just a latency nicety for
+  read-only tools like rag_answer: for a write action like
+  create_leave_request, re-planning after success doesn't just waste an
+  LLM call, it repeats the write — found live, this created duplicate
+  leave requests in a real deployment before every tool (not just a
+  hardcoded "direct answer" subset) got this treatment.
 
 - Statefulness. A checkpointer gives each conversation thread (keyed by
   the authenticated user by default) persistent memory across requests,
@@ -23,6 +28,7 @@ Reuses agent/react_agent.py's plan_step / synthesize / _ground_final_answer
 logic itself.
 """
 from __future__ import annotations
+import json
 import time
 from typing import Any, Dict, List, Optional, TypedDict
 
@@ -34,11 +40,6 @@ from .react_agent import plan_step, synthesize, _ground_final_answer, ACTOR_SCOP
 from observability import get_logger, log_event
 
 log = get_logger("agent.graph")
-
-# Tools whose successful result is, by construction, a complete answer —
-# routing straight to finalize instead of back through the planner is
-# what actually eliminates the redundant-re-call bug for these.
-DIRECT_ANSWER_TOOLS = {"rag_answer", "doc_search", "check_holiday"}
 
 
 class AgentState(TypedDict, total=False):
@@ -96,8 +97,11 @@ def _execute_tool_node(state: AgentState) -> AgentState:
     )
     state["tool_name"] = name
     state["tool_output"] = obs
+    ok = isinstance(obs, dict) and "error" not in obs
     if name == "rag_answer" and isinstance(obs, dict) and obs.get("context"):
         state.setdefault("rag_context_parts", []).append(obs["context"])
+    elif ok:
+        state.setdefault("rag_context_parts", []).append(json.dumps(obs, ensure_ascii=False))
     return state
 
 
@@ -131,8 +135,10 @@ def _route_after_plan(state: AgentState) -> str:
 def _route_after_tool(state: AgentState) -> str:
     obs = state.get("tool_output")
     ok = isinstance(obs, dict) and "error" not in obs
-    if state.get("tool_name") in DIRECT_ANSWER_TOOLS and ok:
-        return "finalize"  # the deterministic fix — no LLM re-judgment needed
+    # any successful tool call is terminal — no LLM re-judgment, and
+    # critically no re-issuing a write tool that already succeeded
+    if ok:
+        return "finalize"
     if state["steps"] >= state.get("max_steps", 3):
         return "finalize"
     return "plan"

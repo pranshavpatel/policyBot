@@ -255,11 +255,45 @@ def run_agent(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: 
                       ok=("error" not in obs) if isinstance(obs, dict) else True)
 
             trace.append({"step": step, "observation": obs, "latency_ms": tool_latency_ms})
+            ok = isinstance(obs, dict) and "error" not in obs
             if name == "rag_answer" and isinstance(obs, dict) and obs.get("context"):
                 rag_context_parts.append(obs["context"])
+            elif ok:
+                # Grounding isn't only "did this restate retrieved policy
+                # text" — a write action's own structured result (e.g.
+                # create_leave_request echoing back the exact dates it was
+                # given) is just as trustworthy a source for the dates in a
+                # confirmation message, and without this every such
+                # confirmation gets its dates flagged as unsupported
+                # (context="") and replaced with the generic fallback. This
+                # is what silently broke "Request PTO from X to Y" — see
+                # the redundant re-call fix right below for the other half
+                # of that same live bug.
+                rag_context_parts.append(json.dumps(obs, ensure_ascii=False))
             last_obs = obs
             last_tool_name = name
-            # feed observation back to planner context
+
+            if ok:
+                # Deterministic stop, not another round of "does the model
+                # think it's done": a tool call that succeeded is done by
+                # definition for every tool this app has (each one is a
+                # single, complete operation — there's no tool here whose
+                # job is "step 1 of N"). Found live: without this, the
+                # planner kept re-issuing the *same* create_leave_request
+                # call because nothing told it to stop, creating duplicate
+                # leave requests in the real database, not just wasting an
+                # extra LLM call the way it does for a read-only tool like
+                # rag_answer.
+                final = _ground_final_answer(synthesize(user_msg, name, obs), rag_context_parts)
+                trace.append({"synthesis": {"from_tool": name}})
+                total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
+                log_event(log, "agent_run", actor=(actor or {}).get("username"), steps=step,
+                          total_latency_ms=total_ms, outcome="tool_succeeded")
+                return {"type": "final", "answer": final, "steps": step, "trace": trace}
+
+            # Tool errored — feed the error back to the planner so it can
+            # retry with different args or give up, rather than silently
+            # repeating the same failing call.
             context_for_planner = f"{user_msg}\n(Previous result: {json.dumps(obs, ensure_ascii=False)[:2000]})"
             continue
 

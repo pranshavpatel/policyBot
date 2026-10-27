@@ -19,6 +19,10 @@ os.close(_tmp_db_fd)
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp_db_path}"
 os.environ.setdefault("GROQ_API_KEY", "test-dummy-key")
 os.environ.setdefault("JWT_SECRET", "test-secret-not-for-production")
+# slack/slack_app.py reads this at import time (App(token=...)); dummy value
+# is fine since token_verification_enabled=False means no real Slack call
+# happens on import — see that module's docstring.
+os.environ.setdefault("SLACK_BOT_TOKEN", "xoxb-test-dummy-token")
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

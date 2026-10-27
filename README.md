@@ -72,7 +72,18 @@ docker compose up --build
 The backend image bakes the vectorstore in at build time (`RUN python -m scripts.ingest_langchain` in `Dockerfile` — local embeddings, no API key needed at build time), so the container serves real answers immediately on first start, no manual ingest step. Verified end-to-end: built the image, ran it standalone, and separately ran the full `docker compose` stack (both services) — real login, a real `/agent` query through Groq, and a CORS preflight check confirming `config.CORS_ORIGINS` (not a hardcoded list) actually gates which origins the API accepts.
 
 ### 6. Slack (optional)
-Create a Slack App → Event Subscriptions → point the Request URL at `https://<your-tunnel>/slack/events`.
+
+Uses Socket Mode (an outbound websocket from `slack/slack_app.py` to Slack), not the HTTP Events API — there's no inbound Request URL to expose, so no tunnel/ngrok is needed even for local development. At [api.slack.com/apps](https://api.slack.com/apps):
+
+1. Create an app, then **Socket Mode** → enable it.
+2. **OAuth & Permissions** → **Bot Token Scopes** → add `app_mentions:read`, `chat:write`, `im:history`.
+3. **Slash Commands** → **Create New Command** → `/policybot` (the Request URL field is required by the form but unused in Socket Mode; any placeholder value works).
+4. **Install App** to your workspace → copy the Bot User OAuth Token (`xoxb-...`) into `SLACK_BOT_TOKEN`.
+5. **Basic Information** → **App-Level Tokens** → generate one with the `connections:write` scope → copy it (`xapp-...`) into `SLACK_APP_TOKEN`.
+6. Set `POLICYBOT_SERVICE_USERNAME`/`POLICYBOT_SERVICE_PASSWORD` in `.env` (defaults to the seeded `manager1` account — see the identity-mapping note in `slack/slack_app.py` for why this is one shared account, not per-Slack-user).
+7. Run it: `uvicorn api.app:app --port 8000` in one terminal, `python -m slack.slack_app` in another.
+
+**Verified live**, not just wired up: mentioned/DM'd/slash-commanded a running bot against a real Slack workspace and a local PolicyBot instance — both a read (`rag_answer`, citation-grounded) and a write (`create_leave_request`) request worked end-to-end, confirmed by cross-checking the backend's structured logs and the database (`steps: 1`, single `create_leave_request` call, no duplicate rows — the same fix from "Groundedness guardrail" above holds through this entry point too). Found and fixed two real issues getting there: `App(token=...)` defaults to making a live `auth.test` call to Slack as a side effect of being constructed, which would otherwise make the module unimportable in CI with no network/real token — fixed with `token_verification_enabled=False`; and `slack/` (no `__init__.py` until now) was being shadowed by an unrelated installed `slack` pip package when invoked as `python -m slack.slack_app`, silently running the wrong module — fixed by adding `slack/__init__.py`, which also means you no longer need to invoke it as a bare script to dodge that.
 
 ### 7. Deploy (backend on Render, frontend on Vercel)
 

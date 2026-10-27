@@ -15,7 +15,13 @@ SHOW_TRACE_DEFAULT = os.getenv("SHOW_TRACE_DEFAULT", "false").lower() == "true"
 SERVICE_USERNAME = os.getenv("POLICYBOT_SERVICE_USERNAME", "manager1")
 SERVICE_PASSWORD = os.getenv("POLICYBOT_SERVICE_PASSWORD", "manager123")
 
-app = App(token=os.environ["SLACK_BOT_TOKEN"])
+# token_verification_enabled=False: the default (True) makes a live
+# auth.test call to Slack's API as a side effect of constructing App() —
+# i.e. just importing this module hits the network. That's unverifiable
+# in CI/tests (no real token, no network) and an unnecessary cost on every
+# import besides. An invalid token still fails loudly the first time the
+# bot actually tries to use it, just not at import time.
+app = App(token=os.environ["SLACK_BOT_TOKEN"], token_verification_enabled=False)
 
 _token_lock = threading.Lock()
 _token_cache = {"value": None, "expires_at": 0}

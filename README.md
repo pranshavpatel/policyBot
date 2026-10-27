@@ -4,12 +4,14 @@
 
 PolicyBot is an HR assistant that answers policy questions over a RAG pipeline and manages leave requests through a ReAct-style chat agent and a REST API, both behind JWT auth with role-based access control and an audit trail.
 
+**🔗 Live demo: [policy-bot-two.vercel.app](https://policy-bot-two.vercel.app)** — log in as `alice` / `alice123` (employee) or `manager1` / `manager123` (manager) and ask it something like *"How many PTO days in Year 1?"* or *"Request PTO from next Monday to next Wednesday."* Backend is on Render's free tier, so the first request after a period of inactivity can take ~30–50s to cold-start — that's Render, not the app.
+
 - **FastAPI backend**, JWT auth + RBAC, structured JSON logging
 - **Hybrid (BM25 + dense) retrieval + cross-encoder reranking** over 26 HR/IT policy docs, with a lexical groundedness guardrail on generated answers
 - **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM) — 90.0% end-to-end accuracy measured on real GPU hardware (`qwen3:32b`, RTX 6000 Ada) — that can also create/approve/reject/cancel leave requests as tool calls
 - **React + Tailwind frontend** for the chat UI
-- **Slack integration** via the Events API
-- **90-test pytest suite + GitHub Actions CI**
+- **Slack integration** via Socket Mode, tested end-to-end against a real workspace
+- **104-test pytest suite + GitHub Actions CI**
 
 ---
 
@@ -17,9 +19,9 @@ PolicyBot is an HR assistant that answers policy questions over a RAG pipeline a
 
 ```
                      ┌─────────────┐
-  React UI  ───────▶ │  FastAPI    │ ◀─── Slack Events API
-  (frontend/)        │  api/app.py │
-                     └──────┬──────┘
+  React UI  ───────▶ │  FastAPI    │ ◀─── Slack bot (Socket Mode —
+  (frontend/)        │  api/app.py │      outbound from slack/slack_app.py,
+                     └──────┬──────┘      calls the API like any other client)
                             │  JWT (auth/)  →  RBAC (auth/authz.py)  →  audit log (auth/audit.py)
                 ┌───────────┼────────────────┐
                 ▼                            ▼
@@ -283,9 +285,10 @@ uvicorn api.app:app --reload --port 8000
 ## Testing
 
 ```bash
-pytest              # 90 tests: leave-request logic, holiday logic, authz rules,
+pytest              # 104 tests: leave-request logic, holiday logic, authz rules,
                      # groundedness, actor-scoped agent tools, full API RBAC flows,
-                     # retrieval correctness (skipped if the vectorstore isn't built)
+                     # retrieval correctness (skipped if the vectorstore isn't built),
+                     # both agent engines' routing, the Slack adapter
 ```
 
 CI (`.github/workflows/ci.yml`) builds the vectorstore with local embeddings (no secret required — `GROQ_API_KEY` only needs to be *present*, since `ChatGroq`'s constructor validates that and nothing in the suite calls `.invoke()`), runs the suite, and separately lints + builds the frontend.
@@ -303,7 +306,7 @@ policyBot/
 ├── observability.py
 ├── rag/          # splitter, embeddings, dense + hybrid retrieval, groundedness
 ├── scripts/      # ingest, db_init, eval_retrieval, eval_via_api
-├── slack/        # Slack Events API integration
+├── slack/        # Slack integration (Socket Mode)
 ├── tools/        # doc_search, qa_chain, leave_request, holiday_check
 ├── tests/        # pytest suite
 └── eval/

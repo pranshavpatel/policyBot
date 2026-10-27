@@ -11,7 +11,7 @@ PolicyBot is an HR assistant that answers policy questions over a RAG pipeline a
 - **ReAct-style chat agent**, LLM provider swappable between Groq (hosted) and any local OpenAI-compatible server (Ollama, vLLM) — 90.0% end-to-end accuracy measured on real GPU hardware (`qwen3:32b`, RTX 6000 Ada) — that can also create/approve/reject/cancel leave requests as tool calls
 - **React + Tailwind frontend** for the chat UI
 - **Slack integration** via Socket Mode, tested end-to-end against a real workspace
-- **104-test pytest suite + GitHub Actions CI**
+- **105-test pytest suite + GitHub Actions CI**
 
 ---
 
@@ -285,7 +285,7 @@ uvicorn api.app:app --reload --port 8000
 ## Testing
 
 ```bash
-pytest              # 104 tests: leave-request logic, holiday logic, authz rules,
+pytest              # 105 tests: leave-request logic, holiday logic, authz rules,
                      # groundedness, actor-scoped agent tools, full API RBAC flows,
                      # retrieval correctness (skipped if the vectorstore isn't built),
                      # both agent engines' routing, the Slack adapter

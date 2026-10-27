@@ -168,6 +168,13 @@ GroundednessResult(grounded=False, coverage=0.0, unsupported_claims=['25'])
 
 When an answer fails the check, it's swapped for an explicit low-confidence fallback rather than shown to the user. Unit-tested in `tests/test_groundedness.py`.
 
+**A real bug found live on the deployed app, not in an eval run**: sending *"Request PTO from 2025-10-02 to 2025-10-04"* to the production bot returned the low-confidence fallback instead of a confirmation — and, worse, checking the live data showed 3 duplicate leave requests had been created for the same dates. Reproduced against the deployed API with `trace=True` and found two compounding bugs, both really one root cause (nothing told the loop "a successful write is done"):
+
+- **Duplicate writes**: after `create_leave_request` succeeded, both engines (the hand-rolled loop and the LangGraph one) let the planner decide whether to stop — and it kept re-issuing the identical call for 3 steps, creating 3 real rows in the database. Fine for a read-only tool like `rag_answer` (redundant, just slower), not fine for a write. Fixed in both `agent/react_agent.py::run_agent()` and `agent/graph.py::_route_after_tool()`: any tool call that succeeds is now unconditionally terminal — not an LLM judgment call, and not gated to a hardcoded allowlist of "direct answer" tools (`agent/graph.py` used to route only `rag_answer`/`doc_search`/`check_holiday` straight to finalize; every successful tool does now).
+- **The groundedness guardrail wasn't wrong, it was scoped too narrowly**: the confirmation text echoed back the request's own dates, but only `rag_answer`'s retrieved context was ever added to the grounding pool — a write tool's own structured result (e.g. `create_leave_request` echoing the exact dates it was given) never was, so `rag_context_parts` was empty and every date in the confirmation got flagged as unsupported. Fixed by pooling any successful tool's JSON output as valid grounding context, not just `rag_answer`'s.
+
+Regression-tested for both engines (`tests/test_react_agent_loop.py`, `tests/test_agent_graph.py::test_successful_write_tool_routes_straight_to_finalize_no_duplicate_call`) — the exact "Request PTO from X to Y" scenario, asserting the tool fires once and the confirmation isn't blocked. The 3 duplicate rows created while root-causing this live were cancelled via the same `/leave-requests/{id}/cancel` endpoint a real user would use.
+
 ---
 
 ## End-to-end answer-quality eval

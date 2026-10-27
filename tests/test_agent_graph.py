@@ -6,19 +6,25 @@ qwen3:8b, and conversation memory across two real turns) is documented in
 the README rather than reproduced here, since CI has no local model to
 call out to."""
 import agent.graph as graph_module
-from agent.graph import build_graph, DIRECT_ANSWER_TOOLS
+from agent.graph import build_graph
 from langgraph.checkpoint.memory import MemorySaver
 
 
-def _fake_tools(rag_answer_result=None, rag_answer_error=False):
+def _fake_tools(rag_answer_result=None, rag_answer_error=False, create_leave_calls=None):
     def _rag_answer(args):
         if rag_answer_error:
             return {"error": "boom"}
         return rag_answer_result or {"answer": "15 days", "citations": [], "context": "Year 1: 15 days", "grounded": True}
 
+    def _create_leave_request(args):
+        if create_leave_calls is not None:
+            create_leave_calls.append(args)
+        return {"id": "req-1", "status": "submitted", "start_date": args.get("start_date"), "end_date": args.get("end_date")}
+
     return {
         "rag_answer": {"fn": _rag_answer},
         "check_holiday": {"fn": lambda args: {"is_holiday": False, "name": None, "date": args.get("date_str")}},
+        "create_leave_request": {"fn": _create_leave_request},
     }
 
 
@@ -98,9 +104,30 @@ def test_unknown_tool_name_finalizes_with_error_message(monkeypatch):
     assert "not_a_real_tool" in result["final_answer"]
 
 
-def test_direct_answer_tools_constant_matches_tool_registry_expectations():
-    assert "rag_answer" in DIRECT_ANSWER_TOOLS
-    assert "create_leave_request" not in DIRECT_ANSWER_TOOLS  # a write action, not a query
+def test_successful_write_tool_routes_straight_to_finalize_no_duplicate_call(monkeypatch):
+    # Regression test for a real bug found live: after a successful
+    # create_leave_request, the graph looped back to plan and re-issued
+    # the same write, creating duplicate leave requests in production.
+    # Any successful tool call — not just an allowlisted subset of
+    # read-only ones — must be terminal.
+    calls = []
+    plans = [{"action": "tool", "name": "create_leave_request",
+              "args": {"start_date": "2025-10-02", "end_date": "2025-10-04"}}]
+    graph = _make_graph(monkeypatch, plans, tools=_fake_tools(create_leave_calls=calls))
+    monkeypatch.setattr(
+        graph_module, "synthesize",
+        lambda user_msg, tool_name, tool_output: f"Request submitted for {tool_output['start_date']} to {tool_output['end_date']}.",
+    )
+    result = graph.invoke(
+        {"user_msg": "Request PTO from 2025-10-02 to 2025-10-04",
+         "actor": {"username": "alice", "role": "employee"}, "max_steps": 3,
+         "messages": [], "steps": 0, "trace": [], "rag_context_parts": [], "final_answer": None},
+        config={"configurable": {"thread_id": "t5"}},
+    )
+    assert result["steps"] == 1
+    assert len(calls) == 1  # not re-issued
+    assert "2025-10-02" in result["final_answer"]
+    assert "couldn't verify" not in result["final_answer"]  # not blocked by groundedness either
 
 
 def test_conversation_memory_carries_rag_context_across_turns(monkeypatch):

@@ -176,6 +176,9 @@ def get_graph():
 
 
 _MAX_CARRIED_CONTEXT_CHUNKS = 20  # cap unbounded growth over a long conversation
+# The whole history is rendered into every planner prompt, so without a cap a long conversation
+# gets slower and costlier each turn until it hits the model's context limit.
+_MAX_CARRIED_TURNS = 5
 
 
 def run_agent_graph(user_msg: str, actor: Optional[Dict[str, str]] = None, max_steps: int = 3,
@@ -212,10 +215,10 @@ def run_agent_graph(user_msg: str, actor: Optional[Dict[str, str]] = None, max_s
     )
     total_ms = round((time.perf_counter() - run_t0) * 1000, 1)
 
-    updated_messages = messages + [
+    updated_messages = (messages + [
         {"role": "user", "content": user_msg},
         {"role": "assistant", "content": result["final_answer"]},
-    ]
+    ])[-2 * _MAX_CARRIED_TURNS:]
     updated_context = result.get("rag_context_parts", prior_context)[-_MAX_CARRIED_CONTEXT_CHUNKS:]
     graph.update_state(graph_config, {"messages": updated_messages, "rag_context_parts": updated_context})
 

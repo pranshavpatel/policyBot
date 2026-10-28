@@ -130,6 +130,32 @@ def test_successful_write_tool_routes_straight_to_finalize_no_duplicate_call(mon
     assert "couldn't verify" not in result["final_answer"]  # not blocked by groundedness either
 
 
+def test_conversation_history_is_capped(monkeypatch):
+    # Every stored message is rendered into each planner prompt, so uncapped history grows the
+    # prompt every turn until it hits the model's context limit.
+    from agent.graph import run_agent_graph, _MAX_CARRIED_TURNS
+
+    contexts = []
+
+    def _fake_plan_step(context):
+        contexts.append(context)
+        return {"action": "final", "answer": "noted"}
+
+    monkeypatch.setattr(graph_module, "plan_step", _fake_plan_step)
+    monkeypatch.setattr(graph_module, "_compiled_graph", None)
+
+    markers = [f"marker-{chr(ord('a') + i)}" for i in range(_MAX_CARRIED_TURNS + 3)]
+    for m in markers:
+        run_agent_graph(m, actor={"username": "dave", "role": "employee"}, thread_id="captest")
+
+    stored = graph_module.get_graph().get_state({"configurable": {"thread_id": "captest"}}).values["messages"]
+    assert len(stored) == 2 * _MAX_CARRIED_TURNS
+    assert stored[-2]["content"] == markers[-1]
+    last_prompt = contexts[-1]
+    assert markers[-2] in last_prompt  # recent turns still visible to the planner
+    assert markers[0] not in last_prompt  # oldest turns dropped
+
+
 def test_conversation_memory_carries_rag_context_across_turns(monkeypatch):
     # Regression test for a real issue found testing this against a live
     # model: a follow-up answered from conversation memory (no new
